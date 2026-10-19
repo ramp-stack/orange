@@ -1,63 +1,51 @@
-#![allow(clippy::new_ret_no_self)]
-use chk::{FormAction, Page, FormValidState, FormComplete, FormItem, Flow, Display, Context, PageType, Theme, Form, Root, State, FormSubmit, ListItem};
+use chk::{Context, Display, Flow, Form, FormAction, FormComplete, FormItem, FormSubmit,
+    FormValidState, ListItem, Page, PageType, Root, State, Theme, Watch};
 use chk::air::profiles::Profile;
-use maverick_os::air::{Name, Instance};
+use ramp::prism::air::{Instance, Name};
 use std::str::FromStr;
 
-#[derive(Debug, Clone)]
 pub struct ContactsHome;
 impl ContactsHome {
-    pub fn new(ctx: &mut Context) -> Root {
-        Root::custom(Page::updates_list_changes::<Profile>(ctx, |ctx: &mut Context, _: &Theme, mut list: Vec<Instance<Profile>>| {
-            let new_contact = Box::new(|_ctx: &mut Context, theme: &Theme| Flow::from_form(NewContact::new(theme)));
-            let mut items = list.iter_mut().flat_map(|instance| {
-                let instance_clone = instance.clone();
-                let profile = instance.pending();
-                if profile.name.unwrap() != ctx.me() {
-                    let view_contact = Flow::new(vec![ViewContact::new(ctx, instance_clone)]);
-                    Some(ListItem::avatar(profile.avatar.clone(), &profile.username, &profile.name(), None, Some(view_contact)))
-                } else {None}
-            }).collect::<Vec<ListItem>>();
-            items.sort_by(|a, b| a.title.cmp(&b.title));
-            
-            PageType::root("Contacts", vec![], vec![
-                Display::list(None, items, Some("No contacts yet.\nGet started by adding a friend.")),
-            ], None, Some(("New Contact".into(), new_contact)), None,)
-        }))
+    pub fn new() -> Root {
+        Root::custom(Page::watching(Watch::list::<Profile>(),
+            |ctx: &mut Context, _theme: &Theme, profiles: Vec<Instance<Profile>>| {
+                let me = ctx.air.me();
+                let mut items = profiles.into_iter().filter_map(|mut instance| {
+                    if instance.pending().name == Some(me) {return None;}
+                    let view = Flow::new(vec![Page::profile(ctx, &mut instance)]);
+                    let profile = instance.pending();
+                    Some(ListItem::avatar(profile.avatar.clone(), &profile.username,
+                        &profile.name(), None, Some(view)))
+                }).collect::<Vec<_>>();
+                items.sort_by(|a, b| a.title.cmp(&b.title));
+                let new_contact = Box::new(|_ctx: &mut Context, theme: &Theme| {
+                    Flow::from_form(NewContact::new(theme))
+                });
+                PageType::root("Contacts", vec![], vec![Display::list(None, items,
+                    Some("No contacts yet.\nGet started by adding a friend."))], None,
+                    Some(("New Contact".into(), new_contact)), None)
+            }))
     }
 }
 
 pub struct NewContact;
 impl NewContact {
     pub fn new(theme: &Theme) -> Form {
-        let closure = Box::new(move |ctx: &mut Context, objects: &Vec<State>| {
-            let profile = if let Some(State::Text(result)) = objects.first() {
-                let name = Name::from_str(result).unwrap();
-                Profile::create(ctx, name)
-            } else {todo!()};
-            FormComplete::Next(ViewContact::new(ctx, profile))
+        let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
+            let State::Text(name) = &state[0] else {unreachable!()};
+            let mut profile = Profile::create(ctx, Name::from_str(name).unwrap());
+            FormComplete::Next(Page::profile(ctx, &mut profile))
         }) as Box<dyn FormSubmit>;
-
-        Form::flow(theme, vec![
-            FormItem::text("New contact", "orange name", 
-            Some(vec![FormAction::Paste, FormAction::scan_qr_code("Scan a profile QR code")]), 
-            |ctx: &mut Context, a: String| match a.is_empty() {
-                true => FormValidState::Invalid,
-                false => match Name::from_str(&a) {
-                    Ok(name) => match name == ctx.me() {
-                        true => FormValidState::InvalidWithData("You cannot add yourself as a contact.".to_string()),
-                        false => FormValidState::Valid,
-                    },
-                    Err(_) => FormValidState::InvalidWithData("This is not a valid orange name.".to_string())
-                }
-            }),
-        ], None, None, closure)
-    }
-}
-
-pub struct ViewContact;
-impl ViewContact {
-    pub fn new(ctx: &mut Context, mut profile: Instance<Profile>) -> Page {
-        Page::profile(ctx, &mut profile)
+        Form::flow(theme, vec![FormItem::text("New contact", "orange name", Some(vec![
+            FormAction::Paste, FormAction::scan_qr_code("Scan a profile QR code"),
+        ]), |ctx: &mut Context, name: String| {
+            if name.is_empty() {FormValidState::Invalid}
+            else {match Name::from_str(&name) {
+                Ok(name) if name == ctx.air.me() => FormValidState::InvalidWithData(
+                    "You cannot add yourself as a contact.".into()),
+                Ok(_) => FormValidState::Valid,
+                Err(_) => FormValidState::InvalidWithData("This is not a valid orange name.".into()),
+            }}
+        })], None, None, submit)
     }
 }

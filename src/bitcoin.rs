@@ -1,50 +1,34 @@
 #![allow(clippy::new_ret_no_self)]
-use ramp::prism;
-use prism::IS_MOBILE;
 
 use std::sync::{Arc, Mutex};
 
 use crate::wallet::{self, WalletService, WalletTx};
 
 use chk::{
-    FormItem, NumberVariant, Flow, Bumper, FormComplete,
-    Display, Offset, Context, PageType, PageBuilder, Icons,
-    Theme, Form, Root, State, Review, Success, FormSubmit,
-    Timestamp, Action, TableItem, FormValidState, Page,
+    FormItem, NumberVariant, Flow, Bumper,
+    Display, Offset, Context, Page, PageType, Icons,
+    Theme, Form, Root, State, Review, Success, FormSubmit, FormComplete, FormAction,
+    Timestamp, TableItem, FormValidState,
 };
 
 #[derive(Debug, Clone)]
 pub struct BitcoinHome;
 
 impl BitcoinHome {
-    pub fn new(theme: &Theme, wallet: &Arc<Mutex<WalletService>>) -> Root {
-        let _price = wallet.lock().unwrap().price().unwrap();
-
+    pub fn new(wallet: &Arc<Mutex<WalletService>>) -> Root {
         let sw = wallet.clone();
         let rw = wallet.clone();
         let send = Box::new(move |_: &mut Context, theme: &Theme| Flow::from_form(SendForm::new(theme, &sw)));
-        let receive = Box::new(move |_: &mut Context, theme: &Theme| Flow::new(vec![Receive::new(&rw)]));
+        let receive = Box::new(move |_: &mut Context, _theme: &Theme| Flow::new(vec![Receive::new(&rw)]));
 
         let mut w = wallet.lock().unwrap();
         let price = w.price().unwrap();
         let balance = w.balance().unwrap();
 
-        let _wallet = wallet.clone();
-        let _theme = theme.clone();
         Root::new("Wallet",
             vec![
-                Display::currency(move || balance.clone().usd_f32(price).into(), &balance.clone().btc()),
-                // Display::list(None, Arc::new(Box::new(move |ctx: &mut Context| {
-                //     wallet.lock().unwrap().transactions().ok().unwrap().into_iter().map(|t| {
-                //         let title = if t.received { "Received bitcoin" } else { "Sent bitcoin" };
-                //         let subtitle = Timestamp::new(t.timestamp.map(|dt| dt.into())).friendly();
-
-                //         let usd = t.amount.usd(price);
-                //         let view = Flow::new(&theme.clone(), vec![ViewTransaction::new(price, t)]);
-                //         ListItem::plain(title, &subtitle, Some(&usd), Some(view))
-                //     }).collect::<Vec<_>>()
-                // })), None),
-            ], 
+                Display::currency(move || balance.0.to_btc() * price, &balance.btc()),
+            ],
             None, Some(("Receive".into(), receive)), Some(("Send".into(), send)),
         )
     }
@@ -53,8 +37,7 @@ impl BitcoinHome {
 pub struct Receive;
 impl Receive {
     pub fn new(wallet: &Arc<Mutex<WalletService>>) -> Page {
-        let wallet = wallet.clone();
-        let address = wallet.lock().unwrap().next_address().expect("Could not next address").to_qr_uri();
+        let address = wallet.lock().unwrap().next_address().expect("Could not get next address").to_qr_uri();
         Page::Static(PageType::display_qr_code("Receive bitcoin", &address, "Scan to receive bitcoin."))
     }
 }
@@ -62,7 +45,6 @@ impl Receive {
 pub struct ViewTransaction;
 impl ViewTransaction {
     pub fn new(price: f64, transaction: WalletTx) -> Page {
-        let t = transaction.clone();
         let timestamp = Timestamp::new(transaction.timestamp.map(|dt| dt.into()));
 
         let items = match transaction.received {
@@ -89,10 +71,7 @@ impl ViewTransaction {
         Page::Static(PageType::display(
             &format!("{} bitcoin", if transaction.received {"Received"} else {"Sent"}),
             vec![
-                Display::currency(move || {
-                    let transaction = t.clone();
-                    transaction.amount.usd_f32(price).into()
-                }, &transaction.amount.btc()),
+                Display::currency(move || transaction.amount.0.to_btc() * price, &transaction.amount.btc()),
                 Display::table("Transaction details", items, None),
             ],
             None,
@@ -128,8 +107,6 @@ impl SendForm {
             FormComplete::None
         }) as Box<dyn FormSubmit>;
 
-        println!("On submit created.");
-
         let w = wallet.clone();
         let review = move |objects: &Vec<State>| {
             let State::Text(address) = objects[0].clone() else { panic!("No Address"); };
@@ -163,12 +140,11 @@ impl SendForm {
             let usd = amount.trim_start_matches('$').parse::<f64>().unwrap_or_default();
             (Icons::Bitcoin, format!("You sent ${:.2}", usd))
         };
-        
+
         let w = wallet.clone();
         Form::flow(theme, vec![
-            FormItem::text("Bitcoin address", Some(vec![
-                ("Paste clipboard".to_string(), Some("Pasted".to_string()), Icons::Paste, Action::Paste),
-                ("Scan QR code".to_string(), None, Icons::QrCode, Action::scan_qr(theme, "Scan a bitcoin QR code")),
+            FormItem::text("Bitcoin address", "Enter a bitcoin address", Some(vec![
+                FormAction::Paste, FormAction::scan_qr_code("Scan a bitcoin QR code"),
             ]), |_ctx: &mut Context, a: String| FormValidState::from(WalletService::ui_valid_address(&a))),
             FormItem::number("Bitcoin amount", NumberVariant::Currency, move |_ctx: &mut Context, a: String| FormValidState::from(w.clone().lock().unwrap().ui_can_afford(a))),
             FormItem::enumerator("Transaction speed", vec![

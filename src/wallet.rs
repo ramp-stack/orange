@@ -93,16 +93,13 @@ pub struct WalletTx {
 
 pub struct WalletService {
     pub wallet: PersistedWallet<FilePersister>,
-    esplora: BlockingClient,
-    network: Network,
     persister: FilePersister,
+    esplora: BlockingClient,
 }
 
 impl WalletService {
     pub fn new() -> Result<Self> {
-        let network = Network::Bitcoin;
-
-        let xpriv = Self::load_or_create_xpriv(network)?;
+        let xpriv = Self::load_or_create_xpriv()?;
         let mut persister = FilePersister::new();
 
         let ext = Bip86(xpriv, KeychainKind::External);
@@ -112,35 +109,35 @@ impl WalletService {
             .descriptor(KeychainKind::External, Some(ext.clone()))
             .descriptor(KeychainKind::Internal, Some(int.clone()))
             .extract_keys()
-            .check_network(network)
+            .check_network(Network::Bitcoin)
             .load_wallet(&mut persister)?;
 
         let esplora = EsploraBuilder::new("https://blockstream.info/api").build_blocking();
 
         Ok(match loaded {
             Some(wallet) => {
-                let mut wallet = Self { wallet, esplora, network, persister };
+                let mut wallet = Self { wallet, esplora, persister };
                 wallet.sync()?;
                 wallet
             },
             None => {
                 let wallet = Wallet::create(ext, int)
-                    .network(network)
+                    .network(Network::Bitcoin)
                     .create_wallet(&mut persister)
                     .expect("wallet create failed");
 
-                let mut wallet = Self { wallet, esplora, network, persister };
+                let mut wallet = Self { wallet, esplora, persister };
                 wallet.full_sync()?;
                 wallet
             }
         })
     }
 
-    fn load_or_create_xpriv(network: Network) -> Result<Xpriv> {
+    fn load_or_create_xpriv() -> Result<Xpriv> {
         let path = env::current_dir().expect("Failed to get current dir").join("wallet_xpriv");
         if path.exists() { return Ok(Xpriv::from_str(fs::read_to_string(&path)?.trim())?); }
         let secret = secp256k1::SecretKey::new(&mut secp256k1::rand::thread_rng());
-        let xpriv = Xpriv::new_master(network, &secret.secret_bytes())?;
+        let xpriv = Xpriv::new_master(Network::Bitcoin, &secret.secret_bytes())?;
         fs::write(&path, xpriv.to_string())?;
         Ok(xpriv)
     }
@@ -212,7 +209,7 @@ impl WalletService {
             false => tx.output.iter().find(|o| !self.wallet.is_mine(o.script_pubkey.clone())),
         }?;
 
-        Address::from_script(&output.script_pubkey, self.network).ok().map(|a| a.to_string())
+        Address::from_script(&output.script_pubkey, Network::Bitcoin).ok().map(|a| a.to_string())
     }
 
     fn tx_timestamp(&self, chain_position: &ChainPosition<impl Anchor>) -> Option<DateTime<Utc>> {
@@ -232,7 +229,7 @@ impl WalletService {
     }
 
     fn temp_wallet(&self) -> Result<PersistedWallet<FilePersister>> {
-        let xpriv = Self::load_or_create_xpriv(self.network)?;
+        let xpriv = Self::load_or_create_xpriv()?;
         let ext = Bip86(xpriv, KeychainKind::External);
         let int = Bip86(xpriv, KeychainKind::Internal);
 
@@ -242,7 +239,7 @@ impl WalletService {
             .descriptor(KeychainKind::External, Some(ext.clone()))
             .descriptor(KeychainKind::Internal, Some(int.clone()))
             .extract_keys()
-            .check_network(self.network)
+            .check_network(self.wallet.network())
             .load_wallet(&mut persister)?
             .ok_or_else(|| anyhow!("failed to load temp wallet"))
     }
