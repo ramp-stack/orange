@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 ramp = {package = "ramp2", version = "1.0.0"}
-chk = {package="chk", path="../chk"}
+chk = {version = "1.1.0", git = "https://github.com/ramp-stack/chk"}
 
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
