@@ -3024,9 +3024,9 @@ dependencies = [
 
 [[package]]
 name = "maverick_os"
-version = "3.0.3"
+version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b34655a787536932a0d7ba772b23eb1f124f3aeef0dcaed437b938f52b41a9c5"
+checksum = "a119ba4f105e5a28acb5fb0dc91fe3b4c2c3f72c33e2a576305a62b00ef78ec7"
 dependencies = [
  "android-activity",
  "android_logger",
@@ -4486,7 +4486,7 @@ dependencies = [
 
 [[package]]
 name = "prism2"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "air",
  "anyanymap",
@@ -4497,7 +4497,6 @@ dependencies = [
  "fontdue",
  "futures",
  "futures-timer",
- "image 0.24.9",
  "include_dir",
  "inventory",
  "nsvg",
@@ -4510,7 +4509,7 @@ dependencies = [
 
 [[package]]
 name = "prism_proc"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "proc-macro2 1.0.106",
  "quote 1.0.45",
@@ -4659,9 +4658,9 @@ checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
 name = "ramp-ffmpeg"
-version = "9.0.3"
+version = "9.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1294d3c12a4987afe3dfb82c4426881829d699cbd3c74a8d5dca63a87ca6fce3"
+checksum = "f269fab707b23eff9de2112a1545e3a2c34d615adfd4c3a5aee0381306d4149a"
 dependencies = [
  "bitflags 2.13.2",
  "libc",
@@ -4669,16 +4668,37 @@ dependencies = [
 ]
 
 [[package]]
-name = "ramp-ffmpeg-sys"
-version = "9.0.4"
+name = "ramp-ffmpeg-ios-arm64"
+version = "9.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7f9fc2c6aca1d6e846d31852a8f0e2bbbafcd3871d4dd307eee1b6ab9b2d057"
+checksum = "eff124fa2f1648f28556272e70d93df405bf244a481693d944c8f83efb62baf9"
+
+[[package]]
+name = "ramp-ffmpeg-ios-sim-arm64"
+version = "9.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f13dec659658ee3759538e623564fd72470777f7addac978a2f1290c7c308c6"
+
+[[package]]
+name = "ramp-ffmpeg-ios-sim-x86_64"
+version = "9.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cef3359dc68b2316b96d7a4a42989ffd19bd752878c6d7c6358b59a922098b30"
+
+[[package]]
+name = "ramp-ffmpeg-sys"
+version = "9.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd4ae4cd5a1349c5608711b34c09d6f593ca884415d9646c39920d7011c8bd8b"
 dependencies = [
  "cc",
  "libc",
  "lzma-rust2",
  "num_cpus",
  "pkg-config",
+ "ramp-ffmpeg-ios-arm64",
+ "ramp-ffmpeg-ios-sim-arm64",
+ "ramp-ffmpeg-ios-sim-x86_64",
  "ramp-nasm",
  "tar",
  "vcpkg",
@@ -4696,7 +4716,7 @@ dependencies = [
 
 [[package]]
 name = "ramp2"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
  "air",
  "air_notifications",
@@ -4704,7 +4724,6 @@ dependencies = [
  "crossfire",
  "erased-serde",
  "futures",
- "image 0.24.9",
  "include_dir",
  "log",
  "maverick_os",
@@ -6770,7 +6789,7 @@ dependencies = [
 
 [[package]]
 name = "wgpu_prism"
-version = "6.0.0"
+version = "6.0.1"
 dependencies = [
  "bytemuck",
  "image 0.24.9",
