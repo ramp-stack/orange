@@ -24,6 +24,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Record audio with your camera and microphone.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses the camera to scan QR codes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

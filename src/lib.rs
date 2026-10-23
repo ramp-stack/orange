@@ -1,11 +1,7 @@
-use ramp::prism;
-use prism::air::Contracts;
-use prism::drawable::Drawable;
 use chk::{App, Assets, RootInfo, ChkTheme, AvatarIconStyle, Context, Icons, AvatarContent, Color, Theme};
-use chk::air::{messages::ChatRoom, profiles::Profile};
+use ramp::prism;
+use prism::drawable::Drawable;
 
-mod state;
-pub use state::*;
 mod messages;
 mod contacts;
 mod profile;
@@ -16,11 +12,6 @@ pub struct Orange;
 
 impl prism::Application for Orange {
     fn name() -> String {"Orange".into()}
-
-    fn contracts<A: prism::traits::Air>(contracts: Contracts<A>) -> Contracts<A> {
-        contracts.add::<ChatRoom>().add::<Profile>().add::<chk::blocking::Block>()
-            .add::<chk::messages::VideoClip>().add::<chk::messages::StickerPack>()
-    }
 
     fn new(ctx: &mut Context) -> impl Drawable {
         Orange.build(ctx, Assets::new(vec![include_dir::include_dir!("$CARGO_MANIFEST_DIR/resources")]))

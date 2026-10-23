@@ -1,7 +1,10 @@
-use chk::{Context, Display, Flow, Form, FormAction, FormComplete, FormItem, FormSubmit,
-    FormValidState, ListItem, Page, PageType, Root, State, Theme, Watch};
+use chk::{
+    Context, Display, Flow, Form, FormAction, FormComplete, FormItem, FormSubmit,
+    FormValidState, ListItem, Page, PageType, Root, State, Theme, Watch
+};
 use chk::air::profiles::Profile;
 use ramp::prism::air::{Instance, Name};
+
 use std::str::FromStr;
 
 pub struct ContactsHome;

@@ -1,11 +1,12 @@
 [package]
 name = "orange"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
+default-run = "orange"
 
 [dependencies]
-ramp = {package = "ramp2", version = "1.0.0"}
-chk = {version = "1.1.0", git = "https://github.com/ramp-stack/chk"}
+ramp = {package = "ramp2", path = "../ramp"}
+chk = {path = "../chk"}
 
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }
@@ -46,3 +47,57 @@ opt-level = 3
 opt-level = 3
 [profile.dev.package.weezl]
 opt-level = 3
+
+[patch.crates-io]
+prism2 = {path = "../prism"}
+prism_proc = {path = "../prism/prism_proc"}
+wgpu_prism = {path = "../wgpu_prism"}
+
+[patch."https://github.com/ramp-stack/pelican_ui"]
+pelican_ui = {path = "../pelican_ui"}
+
+[patch."https://github.com/ramp-stack/ptsd"]
+ptsd2 = {path = "../ptsd"}
+
+[package.metadata.piston.ios]
+team = "RYYG6X8WK7"
+bundle_id = "org.ramp.orange"
+minimum_os = "17.0"
+info_plist = "ios/Info.plist"
+resources = ["ios/LaunchScreen.storyboard", "ios/wordmark.png"]
+build_number = "25"
+
+[package.metadata.piston.app_store_connect]
+issuer_id = "694b6595-5c96-4c71-a2c7-c417a04656ea"
+key_id = "QL688M5TN2"
+key_path = "/Users/caleb/Downloads/AuthKey_QL688M5TN2.p8"
+
+[package.metadata.piston.testflight]
+app_id = "6746295142"
+version = "1.0.0"
+build_number = "24"
+state = "complete"
+
+[package.metadata.piston.notifications]
+enabled = true
+
+[package.metadata.piston.notifications.ios.development]
+team = "RYYG6X8WK7"
+topic = "org.ramp.orange"
+identity = "034a7fc297ebf47f42c9d88f1ba9e7893af169bd72d151fb09e1886dac79be3e50"
+keychain = "cargo-piston/credentials"
+application = "7571ce3b577c5fe48a2cb5fcd5c1e5bd0e6b88101649b610e0921e1a452075fc"
+key_id = "5N8NR2FN64"
+key_path = "/Users/caleb/Downloads/AuthKey_5N8NR2FN64.p8"
+
+[package.metadata.piston.notifications.macos.development]
+team = "RYYG6X8WK7"
+topic = "org.ramp.orange"
+identity = "034a7fc297ebf47f42c9d88f1ba9e7893af169bd72d151fb09e1886dac79be3e50"
+keychain = "cargo-piston/credentials"
+application = "7571ce3b577c5fe48a2cb5fcd5c1e5bd0e6b88101649b610e0921e1a452075fc"
+key_id = "5N8NR2FN64"
+key_path = "/Users/caleb/Downloads/AuthKey_5N8NR2FN64.p8"
+
+[package.metadata.piston.macos]
+team = "RYYG6X8WK7"

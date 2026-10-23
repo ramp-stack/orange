@@ -1,8 +1,11 @@
-use chk::{Action, AvatarContent, AvatarIconStyle, Context, Display, Flow, Form, FormAction,
+use chk::{
+    Action, AvatarContent, AvatarIconStyle, Context, Display, Flow, Form, FormAction,
     FormComplete, FormItem, FormSubmit, FormValidState, Icons, ListItem, Page, PageType, Root,
-    State, Theme, Watch};
+    State, Theme, Watch
+};
 use chk::air::{messages::{ChatRoom, MessageContent}, profiles::Profile};
 use ramp::prism::air::{Instance, Name};
+
 use std::str::FromStr;
 
 pub struct MessagesHome;
