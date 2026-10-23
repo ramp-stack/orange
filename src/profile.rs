@@ -1,11 +1,10 @@
-#![allow(clippy::new_ret_no_self)]
-
-use chk::{Context, State, FormSubmit, FormItem, Display, Icons, Root, Action, Theme, PageType};
-use chk::air::profiles::{Profile, ChangeNotes, ChangeUsername};
+use chk::{Context, Page, Root};
+use chk::air::profiles::Profile;
 
 pub struct ProfileHome;
 impl ProfileHome {
-    pub fn new(ctx: &mut Context, _theme: &Theme) -> Root {
-        Root::custom(PageType::profile(Profile::me(ctx)))
+    pub fn new(ctx: &mut Context) -> Root {
+        let mut profile = Profile::me(ctx);
+        Root::custom(Page::profile(ctx, &mut profile))
     }
 }

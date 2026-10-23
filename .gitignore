@@ -1,3 +1,7 @@
 /target
 wallet_state.json
 wallet_xpriv
+/CACHE
+/.env
+
+*.p8

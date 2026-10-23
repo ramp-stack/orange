@@ -1,76 +1,54 @@
-#![allow(clippy::new_ret_no_self)]
-use chk::{FormValidState, Icons, Action, AvatarContent, FormItem, Flow, Display, Context, PageType, PageBuilder, Theme, Form, Root, State, FormSubmit, ListItem};
+use chk::{
+    Context, Display, Flow, Form, FormAction, FormComplete, FormItem, FormSubmit,
+    FormValidState, ListItem, Page, PageType, Root, State, Theme, Watch
+};
 use chk::air::profiles::Profile;
-use air::names::{Id, Name};
-use air::Instance;
-use std::str::FromStr;
-use std::sync::Arc;
+use ramp::prism::air::{Instance, Name};
 
-#[derive(Debug, Clone)]
+use std::str::FromStr;
+
 pub struct ContactsHome;
 impl ContactsHome {
-    pub fn new(_ctx: &mut Context, theme: &Theme) -> Root {
-        
-        let new_contact = Box::new(|_ctx: &mut Context, theme: &Theme| Flow::from_form(NewContact::new(theme)));
-        // let new_contact = Flow::from_form(NewContact::new(theme));
-        // let new_contact = Flow::new(&theme, vec![NewContact::new(theme)]);
-
-        let theme = theme.clone();
-        Root::new(
-            "Contacts", vec![
-                Display::list(None, Arc::new(Box::new(move |ctx: &mut Context| {
-                    let _me = ctx.me();
-                    let mut list = ctx.list::<Profile>();
-                    let mut items = list.iter_mut().flat_map(|instance| {
-                        let instance_clone = instance.clone();
-                        let profile = instance.pending();
-                        if profile.name.unwrap() != ctx.me() {
-                            let view_contact = Flow::new(&theme, vec![ViewContact::new(ctx, instance_clone)]);
-                            Some(ListItem::avatar(profile.avatar.clone(), &profile.username, &profile.name(), None, Some(view_contact)))
-                        } else {None}
-                    }).collect::<Vec<ListItem>>();
-                    items.sort_by(|a, b| a.title.cmp(&b.title));
-                    items
-                })), Some("No contacts yet.\nGet started by adding a friend.")),
-            ], None, 
-            ("New Contact".into(), new_contact), None,
-        )
+    pub fn new() -> Root {
+        Root::custom(Page::watching(Watch::list::<Profile>(),
+            |ctx: &mut Context, _theme: &Theme, profiles: Vec<Instance<Profile>>| {
+                let me = ctx.air.me();
+                let mut items = profiles.into_iter().filter_map(|mut instance| {
+                    if instance.pending().name == Some(me) {return None;}
+                    let view = Flow::new(vec![Page::profile(ctx, &mut instance)]);
+                    let profile = instance.pending();
+                    Some(ListItem::avatar(profile.avatar.clone(), &profile.username,
+                        &profile.name(), None, Some(view)))
+                }).collect::<Vec<_>>();
+                items.sort_by(|a, b| a.title.cmp(&b.title));
+                let new_contact = Box::new(|_ctx: &mut Context, theme: &Theme| {
+                    Flow::from_form(NewContact::new(theme))
+                });
+                PageType::root("Contacts", vec![], vec![Display::list(None, items,
+                    Some("No contacts yet.\nGet started by adding a friend."))], None,
+                    Some(("New Contact".into(), new_contact)), None)
+            }))
     }
-
-    // fn update(&self, ctx: &mut Context) -> bool {
-    //     self.0 != ctx.list::<ChatRoom>()
-    // }
 }
 
 pub struct NewContact;
 impl NewContact {
     pub fn new(theme: &Theme) -> Form {
-        let closure = Box::new(move |ctx: &mut Context, objects: &Vec<State>| {
-            let profile = if let Some(State::Text(result)) = objects.first() {
-                let name = Name::from_str(result).unwrap();
-                Profile::create(ctx, name)
-            } else {todo!()};
-            Some(ViewContact::new(ctx, profile))
+        let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
+            let State::Text(name) = &state[0] else {unreachable!()};
+            let mut profile = Profile::create(ctx, Name::from_str(name).unwrap());
+            FormComplete::Next(Page::profile(ctx, &mut profile))
         }) as Box<dyn FormSubmit>;
-
-        Form::flow(theme, vec![
-            FormItem::text("Orange name", Some(vec![
-                ("Paste clipboard".to_string(), Icons::Paste, Action::Paste),
-                ("Scan QR code".to_string(), Icons::QrCode, Action::scan_qr(theme, "Scan a profile QR code")),
-            ]), |_ctx: &mut Context, a: String| match a.is_empty() {
-                true => FormValidState::Invalid,
-                false => match Name::from_str(&a) {
-                    Ok(_) => FormValidState::Valid,
-                    Err(_) => FormValidState::InvalidWithData("Not a valid Orange Name.".to_string())
-                }
-            }),
-        ], None, None, closure)
-    }
-}
-
-pub struct ViewContact;
-impl ViewContact {
-    pub fn new(_ctx: &mut Context, profile: Instance<Profile>) -> Box<dyn PageBuilder> {
-        Box::new(move || PageType::profile(profile.clone()))
+        Form::flow(theme, vec![FormItem::text("New contact", "orange name", Some(vec![
+            FormAction::Paste, FormAction::scan_qr_code("Scan a profile QR code"),
+        ]), |ctx: &mut Context, name: String| {
+            if name.is_empty() {FormValidState::Invalid}
+            else {match Name::from_str(&name) {
+                Ok(name) if name == ctx.air.me() => FormValidState::InvalidWithData(
+                    "You cannot add yourself as a contact.".into()),
+                Ok(_) => FormValidState::Valid,
+                Err(_) => FormValidState::InvalidWithData("This is not a valid orange name.".into()),
+            }}
+        })], None, None, submit)
     }
 }
