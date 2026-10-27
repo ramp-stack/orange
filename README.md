@@ -15,7 +15,7 @@ git clone git@github.com:ramp-stack/pelican_ui.git
 git clone git@github.com:ramp-stack/ptsd.git
 cd orange
 cargo check --locked
-cargo install cargo-piston --version 0.5.6 --locked
+cargo install cargo-piston --version 0.5.7 --locked --force
 ```
 
 Restore the complete Cargo Piston identity backup supplied privately by Caleb with
@@ -36,7 +36,8 @@ For a connected iPhone, unlock it and enable Developer Mode. Piston builds, sign
 installs, and streams logs. It uses the existing `org.ramp.orange` identifier.
 Press Ctrl-C to end the development session. Xcode and Apple account sign-in are
 required for iOS development; Piston reports missing prerequisites. If several
-devices match, add `--device "<device name or UDID>"` to select one explicitly.
+devices match, select a number from Piston's device list, or enter `q` to cancel.
+Use `--device "<device name or UDID>"` to select one explicitly, including in scripts.
 
 For the Pelican component studio, run from the sibling `pelican_ui` checkout:
 
