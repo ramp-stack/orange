@@ -4486,7 +4486,9 @@ dependencies = [
 
 [[package]]
 name = "prism2"
-version = "1.0.1"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58e86857c2dbe79765d9c91be28d29a4fbf5cb30490167bbcabd63446df9e11f"
 dependencies = [
  "air",
  "anyanymap",
@@ -4509,7 +4511,9 @@ dependencies = [
 
 [[package]]
 name = "prism_proc"
-version = "1.0.1"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5affb8d298295498963f68a89cb71387c4c8a7060b14f0ece02df9771a2cee09"
 dependencies = [
  "proc-macro2 1.0.106",
  "quote 1.0.45",
@@ -4716,7 +4720,9 @@ dependencies = [
 
 [[package]]
 name = "ramp2"
-version = "1.0.3"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "523388fa164f1000215128bc8a3eea1fd78a7c635806d345fba3e94d5f86a58a"
 dependencies = [
  "air",
  "air_notifications",
@@ -6789,7 +6795,9 @@ dependencies = [
 
 [[package]]
 name = "wgpu_prism"
-version = "6.0.1"
+version = "7.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8d259b03f3417b7bdbc18f6e1130db852a2e04d811f853bb4e8a485b28325f6"
 dependencies = [
  "bytemuck",
  "image 0.24.9",
