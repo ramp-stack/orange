@@ -4,7 +4,9 @@
 
 Frontend work lives in four sibling repositories: `orange`, `chk`, `pelican_ui`, and
 `ptsd`. Caleb owns the backend crates; Cargo downloads their published releases.
-Use the current default branches of all four frontend repositories together.
+Use the current default branches of all four frontend repositories together. This revision uses
+Prism 3.0.0 and WGPU Prism 8.0.0, including the updated layout, native keyboard, media,
+and gesture interfaces. No backend source checkout is required.
 
 ```sh
 mkdir orange-frontend
@@ -67,8 +69,8 @@ configuration above. Development commands do not upload to TestFlight.
 
 ## iOS FFmpeg libraries
 
-Ramp 2.0.0 requires published Maverick 4.0.0, which requires `ramp-ffmpeg` 9.0.4 or later
-and, through it, `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
+Ramp 3.0.0 uses published Maverick 5.0.0 and the shared `media2` 0.1.0 crate. Media requires
+`ramp-ffmpeg` 9.0.4 or later and `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
 and the 9.0.2 binary packages from crates.io. Cargo selects separate precompiled libraries for ARM64
 devices, ARM64 simulators, and Intel simulators. These builds do not compile FFmpeg
 or NASM or run Make. The legacy Xcode project selects the matching Rust static
