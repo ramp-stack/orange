@@ -10,7 +10,7 @@ use std::str::FromStr;
 
 pub struct MessagesHome;
 impl MessagesHome {
-    pub fn new() -> Root {
+    pub fn build() -> Root {
         Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>()),
             |ctx: &mut Context, _theme: &Theme, (rooms, _): (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>)| {
                 let me = ctx.air.me();
@@ -43,10 +43,10 @@ impl MessagesHome {
                     };
                     (timestamp, ListItem::avatar(avatar, &name, &last, None, Some(chat)))
                 }).collect::<Vec<_>>();
-                items.sort_by(|a, b| b.0.cmp(&a.0));
+                items.sort_by_key(|item| std::cmp::Reverse(item.0));
                 let items = items.into_iter().map(|(_, item)| item).collect();
                 let new_message = Box::new(|ctx: &mut Context, theme: &Theme| {
-                    Flow::from_form(NewMessageFlow::new(ctx, theme))
+                    Flow::from_form(NewMessageFlow::build(ctx, theme))
                 });
                 PageType::root("Messages", vec![], vec![Display::list(None, items,
                     Some("No messages yet.\nGet started by messaging a friend."))], None,
@@ -57,7 +57,7 @@ impl MessagesHome {
 
 pub struct NewMessageFlow;
 impl NewMessageFlow {
-    pub fn new(ctx: &mut Context, theme: &Theme) -> Form {
+    pub fn build(ctx: &mut Context, theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Search(recipients) = &state[0] else {unreachable!()};
             let mut room = ChatRoom::create(ctx, recipients.clone());
@@ -73,13 +73,13 @@ impl NewMessageFlow {
         }).collect();
         Form::flow(theme, vec![FormItem::search("New message", "profile name", items,
             Some(vec![FormAction::Custom("New contact".into(), None, Icons::Add,
-                Action::flow(Flow::from_form(CreateAndAddContact::new(theme))))]))], None, None, submit)
+                Action::flow(Flow::from_form(CreateAndAddContact::build(theme))))]))], None, None, submit)
     }
 }
 
 struct CreateAndAddContact;
 impl CreateAndAddContact {
-    fn new(theme: &Theme) -> Form {
+    fn build(theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Text(name) = &state[0] else {unreachable!()};
             let name = Name::from_str(name).unwrap();

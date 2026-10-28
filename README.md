@@ -32,16 +32,17 @@ TestFlight.
 
 ## iOS FFmpeg libraries
 
-Ramp requires published Maverick 4.0.0, which requires `ramp-ffmpeg` 9.0.4 or later
-and, through it, `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
+Ramp, Maverick, and Prism use the sibling `media` checkout (`media2` package), which requires
+`ramp-ffmpeg` 9.0.4 or later and `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
 and the 9.0.2 binary packages from crates.io. Cargo selects separate precompiled libraries for ARM64
 devices, ARM64 simulators, and Intel simulators. These builds do not compile FFmpeg
 or NASM or run Make. The legacy Xcode project selects the matching Rust static
 library for each SDK, architecture, and Debug/Release configuration.
 
-Update Orange and its sibling frontend repositories together on other machines.
-The dependency requirements prevent selecting the old sys 9.0.4 source build;
-no separate FFmpeg update command or local Maverick/FFmpeg checkout is required.
+Update Orange and its sibling frontend, Maverick, and `media` repositories together on other
+machines. The local path dependencies must resolve to those checkouts. The dependency
+requirements prevent selecting the old sys 9.0.4 source build; no local FFmpeg fork or
+separate FFmpeg update command is required.
 
 ## TestFlight
 

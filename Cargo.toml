@@ -8,15 +8,6 @@ default-run = "orange"
 ramp = {package = "ramp2", path = "../ramp"}
 chk = {path = "../chk"}
 
-anyhow = "1"
-serde = { version = "1", features = ["derive"] }
-bitcoin = "0.32"
-bdk_wallet = "3"
-bdk_esplora = { version = "0.22", features = ["blocking"] }
-ureq = { version = "2", features = ["json"] }
-serde_json = "1"
-chrono = "0.4.44"
-unified_uri = "0.1.0"
 include_dir = "0.7.4"
 
 [lib]
@@ -49,6 +40,7 @@ opt-level = 3
 opt-level = 3
 
 [patch.crates-io]
+air = {path = "../air"}
 prism2 = {path = "../prism"}
 prism_proc = {path = "../prism/prism_proc"}
 wgpu_prism = {path = "../wgpu_prism"}
@@ -67,37 +59,12 @@ info_plist = "ios/Info.plist"
 resources = ["ios/LaunchScreen.storyboard", "ios/wordmark.png"]
 build_number = "25"
 
-[package.metadata.piston.app_store_connect]
-issuer_id = "694b6595-5c96-4c71-a2c7-c417a04656ea"
-key_id = "QL688M5TN2"
-key_path = "/Users/caleb/Downloads/AuthKey_QL688M5TN2.p8"
-
-[package.metadata.piston.testflight]
-app_id = "6746295142"
-version = "1.0.0"
-build_number = "24"
-state = "complete"
-
 [package.metadata.piston.notifications]
 enabled = true
 
-[package.metadata.piston.notifications.ios.development]
-team = "RYYG6X8WK7"
-topic = "org.ramp.orange"
-identity = "034a7fc297ebf47f42c9d88f1ba9e7893af169bd72d151fb09e1886dac79be3e50"
-keychain = "cargo-piston/credentials"
-application = "7571ce3b577c5fe48a2cb5fcd5c1e5bd0e6b88101649b610e0921e1a452075fc"
-key_id = "5N8NR2FN64"
-key_path = "/Users/caleb/Downloads/AuthKey_5N8NR2FN64.p8"
-
-[package.metadata.piston.notifications.macos.development]
-team = "RYYG6X8WK7"
-topic = "org.ramp.orange"
-identity = "034a7fc297ebf47f42c9d88f1ba9e7893af169bd72d151fb09e1886dac79be3e50"
-keychain = "cargo-piston/credentials"
-application = "7571ce3b577c5fe48a2cb5fcd5c1e5bd0e6b88101649b610e0921e1a452075fc"
-key_id = "5N8NR2FN64"
-key_path = "/Users/caleb/Downloads/AuthKey_5N8NR2FN64.p8"
-
 [package.metadata.piston.macos]
 team = "RYYG6X8WK7"
+
+[package.metadata.piston.developer]
+team = "RYYG6X8WK7"
+identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"

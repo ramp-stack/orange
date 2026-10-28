@@ -20,9 +20,9 @@ impl prism::Application for Orange {
 
 impl App for Orange {
     fn roots(&self, ctx: &mut Context, theme: &Theme) -> Vec<RootInfo> {
-        let messages_home = messages::MessagesHome::new();
-        let contacts_home = contacts::ContactsHome::new();
-        let profile_home = profile::ProfileHome::new(ctx);
+        let messages_home = messages::MessagesHome::build();
+        let contacts_home = contacts::ContactsHome::build();
+        let profile_home = profile::ProfileHome::build(ctx);
         vec![
             RootInfo::icon(ctx, theme, Icons::Messages, "Messages", messages_home),
             RootInfo::icon(ctx, theme, Icons::Group, "Contacts", contacts_home),
