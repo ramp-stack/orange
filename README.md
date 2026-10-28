@@ -2,23 +2,20 @@
 
 ## Frontend setup
 
-Frontend work lives in four sibling repositories: `orange`, `chk`, `pelican_ui`, and
-`ptsd`. Caleb owns the backend crates; Cargo downloads their published releases.
-Use the current default branches of all four frontend repositories together. This revision uses
-Prism 3.0.0 and WGPU Prism 8.0.0, including the updated layout, native keyboard, media,
-and gesture interfaces. No backend source checkout is required.
+Orange 1.0.1 uses CHK 2.0.0, Pelican UI 3.0.0, and PTSD 0.2.0 from Git. Cargo downloads
+published Ramp 3.0.2, Prism 3.1.0, and their backend dependencies from crates.io.
+A single Orange checkout is enough to build the application.
 
 ```sh
-mkdir orange-frontend
-cd orange-frontend
 git clone git@github.com:ramp-stack/orange.git
-git clone git@github.com:ramp-stack/chk.git
-git clone git@github.com:ramp-stack/pelican_ui.git
-git clone git@github.com:ramp-stack/ptsd.git
 cd orange
 cargo check --locked
-cargo install cargo-piston --version 0.5.7 --locked --force
+cargo install cargo-piston --version 0.5.8 --locked --force
 ```
+
+To edit another frontend crate, clone its repository and use a local Cargo override while
+working. Keep local overrides out of release manifests. The committed lockfile pins the Git
+revisions used by this release.
 
 Restore the complete Cargo Piston identity backup supplied privately by Caleb with
 `cargo piston restore "<complete backup line>"`. Then run `cargo piston setup` in
@@ -41,7 +38,7 @@ required for iOS development; Piston reports missing prerequisites. If several
 devices match, select a number from Piston's device list, or enter `q` to cancel.
 Use `--device "<device name or UDID>"` to select one explicitly, including in scripts.
 
-For the Pelican component studio, run from the sibling `pelican_ui` checkout:
+For the Pelican component studio, clone `pelican_ui` and run from that checkout:
 
 ```sh
 cargo run --locked --features demo --bin pelican_ui
@@ -69,17 +66,16 @@ configuration above. Development commands do not upload to TestFlight.
 
 ## iOS FFmpeg libraries
 
-Ramp 3.0.0 uses published Maverick 5.0.0 and the shared `media2` 0.1.0 crate. Media requires
+Ramp 3.0.2 uses published Maverick 5.0.1 and the shared `media2` 0.1.1 crate. Media requires
 `ramp-ffmpeg` 9.0.4 or later and `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
 and the 9.0.2 binary packages from crates.io. Cargo selects separate precompiled libraries for ARM64
 devices, ARM64 simulators, and Intel simulators. These builds do not compile FFmpeg
 or NASM or run Make. The legacy Xcode project selects the matching Rust static
 library for each SDK, architecture, and Debug/Release configuration.
 
-Update Orange and its sibling frontend, Maverick, and `media` repositories together on other
-machines. The local path dependencies must resolve to those checkouts. The dependency
-requirements prevent selecting the old sys 9.0.4 source build; no local FFmpeg fork or
-separate FFmpeg update command is required.
+Update the Orange checkout and use its committed lockfile on other machines. The dependency
+requirements prevent selecting the old sys 9.0.4 source build; no local backend checkout,
+FFmpeg fork, or separate FFmpeg update command is required.
 
 ## TestFlight
 

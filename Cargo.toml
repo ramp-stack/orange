@@ -1,12 +1,12 @@
 [package]
 name = "orange"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 default-run = "orange"
 
 [dependencies]
-ramp = {package = "ramp2", path = "../ramp"}
-chk = {path = "../chk"}
+ramp = {package = "ramp2", version = "3.0.2"}
+chk = {version = "2.0.0", git = "https://github.com/ramp-stack/chk"}
 
 include_dir = "0.7.4"
 
@@ -38,18 +38,6 @@ opt-level = 3
 opt-level = 3
 [profile.dev.package.weezl]
 opt-level = 3
-
-[patch.crates-io]
-air = {path = "../air"}
-prism2 = {path = "../prism"}
-prism_proc = {path = "../prism/prism_proc"}
-wgpu_prism = {path = "../wgpu_prism"}
-
-[patch."https://github.com/ramp-stack/pelican_ui"]
-pelican_ui = {path = "../pelican_ui"}
-
-[patch."https://github.com/ramp-stack/ptsd"]
-ptsd2 = {path = "../ptsd"}
 
 [package.metadata.piston.ios]
 team = "RYYG6X8WK7"

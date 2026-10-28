@@ -48,7 +48,9 @@ dependencies = [
 
 [[package]]
 name = "air"
-version = "4.0.0"
+version = "4.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a650a61f86d58d7d875fdcf59046332214cb88ee8ede673c3f71f87a1e45e45e"
 dependencies = [
  "chacha20-poly1305",
  "chrono",
@@ -61,7 +63,9 @@ dependencies = [
 
 [[package]]
 name = "air_notifications"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "319908f39345ca96821232a82c424daf88306d56ceb16dff73eac54a8cfe93ac"
 dependencies = [
  "air",
  "serde",
@@ -69,7 +73,9 @@ dependencies = [
 
 [[package]]
 name = "air_server"
-version = "2.0.0"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7bf36ea5b2207e7437dc77def2082a36bd05536a455f5294b3b685ea2103c981"
 dependencies = [
  "air",
  "crossfire",
@@ -746,7 +752,8 @@ checksum = "4b4b0fc281743d80256607bd65e8beedc42cb0787ea119c85b81b4c0eab85e5f"
 
 [[package]]
 name = "chk"
-version = "1.1.0"
+version = "2.0.0"
+source = "git+https://github.com/ramp-stack/chk#3f29add1b2d780968d4e750842c506184c0932f3"
 dependencies = [
  "dyn-clone",
  "futures",
@@ -1227,7 +1234,9 @@ checksum = "117240f60069e65410b3ae1bb213295bd828f707b5bec6596a1afc8793ce0cbc"
 
 [[package]]
 name = "dpi"
-version = "0.1.1"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
 
 [[package]]
 name = "dyn-clone"
@@ -2775,7 +2784,9 @@ dependencies = [
 
 [[package]]
 name = "maverick_os"
-version = "5.0.0"
+version = "5.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "485cbd2fc67ee656e70f236cff260214b2d649bfc9d5a25f0180c240ed643ce8"
 dependencies = [
  "android_logger",
  "arboard",
@@ -2833,7 +2844,9 @@ dependencies = [
 
 [[package]]
 name = "media2"
-version = "0.1.0"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3f6eeed6b76207acab43a9c168539b355ec09a089c6d2d1ee62366894fbe0f9"
 dependencies = [
  "bytemuck",
  "image 0.24.9",
@@ -3732,7 +3745,7 @@ dependencies = [
 
 [[package]]
 name = "orange"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "chk",
  "include_dir",
@@ -3830,7 +3843,8 @@ checksum = "2ee67f1008b1ba2321834326597b8e186293b049a023cdef258527550b9935b4"
 
 [[package]]
 name = "pelican_ui"
-version = "2.2.0"
+version = "3.0.0"
+source = "git+https://github.com/ramp-stack/pelican_ui#62f4a6cee88d3a6b98f3276df9a9a326720ed250"
 dependencies = [
  "bardecoder",
  "base64",
@@ -4062,7 +4076,9 @@ dependencies = [
 
 [[package]]
 name = "prism2"
-version = "3.0.1"
+version = "3.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b4de1c17b00613fc65d31ba782ba53179293dbe96ec0f8d862a8370fa034073"
 dependencies = [
  "air",
  "downcast-rs 2.0.2",
@@ -4081,6 +4097,8 @@ dependencies = [
 [[package]]
 name = "prism_proc"
 version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0d781a327710ac640b0f2ca346b6d04989ca1766383c441996302c799f15157"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4123,7 +4141,8 @@ checksum = "3eb8486b569e12e2c32ad3e204dbaba5e4b5b216e9367044f25f1dba42341773"
 
 [[package]]
 name = "ptsd2"
-version = "0.1.3"
+version = "0.2.0"
+source = "git+https://github.com/ramp-stack/ptsd#c35f6f833615e8b5c38baeaad64c2c84ccc5ee1a"
 dependencies = [
  "chrono",
  "downcast-rs 2.0.2",
@@ -4251,7 +4270,9 @@ dependencies = [
 
 [[package]]
 name = "ramp-winit"
-version = "0.30.14"
+version = "0.30.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6b3b191f1e8adc40ecef2ff2325afb06c4a71388e8c719daf311de86c5bd11e"
 dependencies = [
  "ahash",
  "android-activity",
@@ -4301,7 +4322,9 @@ dependencies = [
 
 [[package]]
 name = "ramp2"
-version = "3.0.1"
+version = "3.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be0aa44110cc44fa44ac9536ba2da6b0018dfe130e9e4f2d1b3763502336ba0b"
 dependencies = [
  "air",
  "air_notifications",
@@ -6159,7 +6182,9 @@ dependencies = [
 
 [[package]]
 name = "wgpu_prism"
-version = "8.0.0"
+version = "8.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26ef970bc24567dfd2eb895b60f3f50d4f8a9b2f2cb05341ecc02f00e8a24ef7"
 dependencies = [
  "bytemuck",
  "fontdue",
