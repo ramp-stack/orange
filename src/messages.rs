@@ -4,11 +4,12 @@ use chk::{
     State, Theme, Watch
 };
 use chk::air::{messages::{ChatRoom, MessageContent}, profiles::Profile};
-use ramp::prism::air::{Instance, Name};
+use ramp::prism::air::{Air, Instance, Instances, Name};
+use ramp::prism::service::Service;
 
 use std::str::FromStr;
 
-pub struct MessagesHome;
+pub struct MessagesHome(Instances<ChatRoom>);
 impl MessagesHome {
     pub fn build() -> Root {
         Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>()),
@@ -54,6 +55,18 @@ impl MessagesHome {
             }))
     }
 }
+impl Service for MessagesHome {
+    type Init = ();
+    type Predicate = Instance<ChatRoom>;
+
+    async fn init(air: Air, _: ()) -> Self {
+        let rooms = air.instances::<ChatRoom>();
+        for room in rooms.list().into_values() {room.notify(true);}
+        Self(rooms)
+    }
+    async fn predicate(&mut self) -> Instance<ChatRoom> {self.0.next().await}
+    async fn handle(&mut self, room: Instance<ChatRoom>) {room.notify(true);}
+}
 
 pub struct NewMessageFlow;
 impl NewMessageFlow {
@@ -61,6 +74,7 @@ impl NewMessageFlow {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Search(recipients) = &state[0] else {unreachable!()};
             let mut room = ChatRoom::create(ctx, recipients.clone());
+            room.notify(true);
             FormComplete::Next(Page::messaging(ctx, &mut room))
         }) as Box<dyn FormSubmit>;
         let me = ctx.air.me();

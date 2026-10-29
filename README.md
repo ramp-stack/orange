@@ -3,7 +3,7 @@
 ## Frontend setup
 
 Orange 1.0.1 uses CHK 2.0.0, Pelican UI 3.0.0, and PTSD 0.2.0 from Git. Cargo downloads
-published Ramp 3.0.2, Prism 3.1.0, and their backend dependencies from crates.io.
+published Ramp 3.0.3, Prism 3.1.0, and their backend dependencies from crates.io.
 A single Orange checkout is enough to build the application.
 
 ```sh
@@ -64,9 +64,31 @@ supported iOS version is 17.0.
 The legacy `orange/` Xcode project remains for reference. Cargo Piston uses the
 configuration above. Development commands do not upload to TestFlight.
 
+## Chat notifications
+
+Orange enables notifications for existing chats at startup and newly received chats through
+its AIR service, independently of the selected tab. Creating a chat enables notifications
+immediately. Ramp saves the notification flag when changed and restores it with the instance;
+the generic instance default remains disabled.
+
+This update uses fresh AIR instance caches. Existing server history is loaded again, but unsent
+work in the previous instance caches is not recovered. There is no cache migration; the saved
+AIR identity is retained.
+
+Build through Cargo Piston after restoring the team's developer identity. Piston retrieves
+notification credentials from the encrypted AIR developer contract and configures the selected
+Apple platform. iPhone development uses sandbox APNs; TestFlight uses production APNs and
+requires its own notification configuration.
+
+On October 29, 2026, real APNs sandbox delivery passed on an iOS 26.3 simulator: an incoming
+chat message produced a native notification with Orange stopped; tapping it reopened Orange,
+loaded the message, and rearmed its watch. This did not validate production APNs or a physical
+iPhone. Piston's simulator flow currently skips remote notification setup; that test built and
+bundled Orange directly with the development notification configuration.
+
 ## iOS FFmpeg libraries
 
-Ramp 3.0.2 uses published Maverick 5.0.1 and the shared `media2` 0.1.1 crate. Media requires
+Ramp 3.0.3 uses published Maverick 5.0.1 and the shared `media2` 0.1.1 crate. Media requires
 `ramp-ffmpeg` 9.0.4 or later and `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
 and the 9.0.2 binary packages from crates.io. Cargo selects separate precompiled libraries for ARM64
 devices, ARM64 simulators, and Intel simulators. These builds do not compile FFmpeg

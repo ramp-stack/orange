@@ -63,9 +63,9 @@ dependencies = [
 
 [[package]]
 name = "air_notifications"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "319908f39345ca96821232a82c424daf88306d56ceb16dff73eac54a8cfe93ac"
+checksum = "ed01e5aa09c5c12d56911f876f8c7ceb71a8d78c8aa5b75df9220df96751d9c8"
 dependencies = [
  "air",
  "serde",
@@ -4322,9 +4322,9 @@ dependencies = [
 
 [[package]]
 name = "ramp2"
-version = "3.0.2"
+version = "3.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be0aa44110cc44fa44ac9536ba2da6b0018dfe130e9e4f2d1b3763502336ba0b"
+checksum = "bb9c2d549fae707c340c99b0818f4a82e2c6006a3b6e24bbfc04bbd1b061dacd"
 dependencies = [
  "air",
  "air_notifications",

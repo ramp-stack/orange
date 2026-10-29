@@ -14,6 +14,7 @@ impl prism::Application for Orange {
     fn name() -> String {"Orange".into()}
 
     fn new(ctx: &mut Context) -> impl Drawable {
+        ctx.air.start::<messages::MessagesHome>(());
         Orange.build(ctx, Assets::new(vec![include_dir::include_dir!("$CARGO_MANIFEST_DIR/resources")]))
     }
 }
