@@ -5,8 +5,8 @@ edition = "2024"
 default-run = "orange"
 
 [dependencies]
-ramp = {package = "ramp2", version = "3.0.3"}
-chk = {path = "../chk"}
+ramp = {package = "ramp2", version = "3.0.4"}
+chk = {version = "2.0.0", git = "https://github.com/ramp-stack/chk", rev = "2da2ba12e6973c17ffa7d8e70dc218d342552fdf"}
 
 include_dir = "0.7.4"
 

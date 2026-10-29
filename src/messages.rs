@@ -9,11 +9,13 @@ use ramp::prism::service::Service;
 
 use std::str::FromStr;
 
+type MessageLists = (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>, Vec<Instance<RoomReadState>>);
+
 pub struct MessagesHome(Instances<ChatRoom>, Air);
 impl MessagesHome {
     pub fn build() -> Root {
         Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>(), Watch::list::<RoomReadState>()),
-            |ctx: &mut Context, _theme: &Theme, (rooms, _, reads): (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>, Vec<Instance<RoomReadState>>)| {
+            |ctx: &mut Context, _theme: &Theme, (rooms, _, reads): MessageLists| {
                 let me = ctx.air.me();
                 let reads = reads.into_iter().filter_map(|instance| {
                     let read = instance.pending();

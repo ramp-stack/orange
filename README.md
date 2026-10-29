@@ -11,24 +11,21 @@ the mobile app does not need access to the file at runtime. An exported
 
 ## Frontend setup
 
-This development checkout uses sibling repositories: CHK 2.0.0, Pelican UI 3.0.0,
-and PTSD 0.1.3. Their local changes include Orange's messaging, keyboard, and media
-features. Cargo downloads published Ramp 3.0.3, Prism 3.1.0, and backend dependencies.
-The older Ramp 3.0.0 copy in `vendor/ramp2` is not used by this dependency graph.
+Cargo retrieves CHK 2.0.0, Pelican UI 3.0.0, and PTSD 0.2.0 from pinned Git revisions.
+Backend dependencies use published Ramp 3.0.4, Maverick 5.0.2, and AIR Notifications 0.2.3.
+This includes native text autocorrection and notification registration recovery. The older
+Ramp 3.0.0 copy in `vendor/ramp2` is not used by this dependency graph.
 
 ```sh
 git clone git@github.com:ramp-stack/orange.git
-git clone git@github.com:ramp-stack/chk.git
-git clone git@github.com:ramp-stack/pelican_ui.git
-git clone git@github.com:ramp-stack/ptsd.git
 cd orange
 cargo check --locked
 cargo install cargo-piston --version 0.5.8 --locked --force
 ```
 
-Keep the sibling checkouts together and retain the path dependencies while developing
-these local changes. Switching to Git dependencies requires migrating those changes to
-the selected Git revisions first.
+Keep the committed `Cargo.lock`; no `cargo update` is needed. Clone the other frontend
+repositories only when editing them. Use local Cargo overrides for related development and
+keep those overrides out of release manifests.
 
 Restore the complete Cargo Piston identity backup supplied privately by Caleb with
 `cargo piston restore "<complete backup line>"`. Then run `cargo piston setup` in
@@ -79,9 +76,10 @@ configuration above. Development commands do not upload to TestFlight.
 
 ## Chat notifications
 
-Orange enables notifications for existing chats at startup and newly received chats through
-its AIR service, independently of the selected tab. Creating a chat enables notifications
-immediately. Ramp saves the notification flag when changed and restores it with the instance;
+Orange enables notifications for joined chats at startup and newly received chats through
+its AIR service, independently of the selected tab. Leaving a group disables its notifications,
+and rejoining enables them. Creating a chat enables notifications immediately. Ramp persists
+the notification flag, while Orange reapplies membership-based notification settings at startup;
 the generic instance default remains disabled.
 
 This update uses fresh AIR instance caches. Existing server history is loaded again, but unsent
@@ -101,7 +99,7 @@ bundled Orange directly with the development notification configuration.
 
 ## iOS FFmpeg libraries
 
-Ramp 3.0.3 uses published Maverick 5.0.1 and the shared `media2` 0.1.1 crate. Media requires
+Ramp 3.0.4 uses published Maverick 5.0.2 and the shared `media2` 0.1.1 crate. Media requires
 `ramp-ffmpeg` 9.0.4 or later and `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
 and the 9.0.2 binary packages from crates.io. Cargo selects separate precompiled libraries for ARM64
 devices, ARM64 simulators, and Intel simulators. These builds do not compile FFmpeg
