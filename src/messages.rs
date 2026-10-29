@@ -3,17 +3,22 @@ use chk::{
     FormComplete, FormItem, FormSubmit, FormValidState, Icons, ListItem, Page, PageType, Root,
     State, Theme, Watch
 };
-use chk::air::{messages::{ChatRoom, MessageContent}, profiles::Profile};
-use ramp::prism::air::{Instance, Name};
+use chk::air::{messages::{ChatRoom, MessageContent, RoomReadState}, profiles::Profile};
+use ramp::prism::air::{Air, Instance, Instances, Name};
+use ramp::prism::service::Service;
 
 use std::str::FromStr;
 
-pub struct MessagesHome;
+pub struct MessagesHome(Instances<ChatRoom>);
 impl MessagesHome {
-    pub fn new() -> Root {
-        Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>()),
-            |ctx: &mut Context, _theme: &Theme, (rooms, _): (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>)| {
+    pub fn build() -> Root {
+        Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>(), Watch::list::<RoomReadState>()),
+            |ctx: &mut Context, _theme: &Theme, (rooms, _, reads): (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>, Vec<Instance<RoomReadState>>)| {
                 let me = ctx.air.me();
+                let reads = reads.into_iter().filter_map(|instance| {
+                    let read = instance.pending();
+                    (read.owner == me).then(|| (read.room, read.clone()))
+                }).collect::<std::collections::HashMap<_, _>>();
                 let mut items = rooms.into_iter().map(|mut instance| {
                     let chat = Flow::new(vec![Page::messaging(ctx, &mut instance)]);
                     let room = instance.pending();
@@ -27,9 +32,6 @@ impl MessagesHome {
                     };
                     let (timestamp, last) = match room.messages(me).last() {
                         Some(last) => {
-                            let author = if last.author == me {"You".into()} else {
-                                Profile::from_name(ctx, last.author).pending().username.clone()
-                            };
                             let preview = match &last.body {
                                 MessageContent::Text(text) => text.as_str(),
                                 MessageContent::Sticker(_) => "Sticker",
@@ -37,16 +39,26 @@ impl MessagesHome {
                                 MessageContent::Photo(_) => "Photo",
                                 MessageContent::Video(_) => "Video",
                             };
-                            (last.timestamp, format!("{author}: {preview}"))
+                            let preview = if last.author == me {
+                                format!("You: {preview}")
+                            } else if members.len() > 1 {
+                                let author = Profile::from_name(ctx, last.author).pending().username.clone();
+                                format!("{author}: {preview}")
+                            } else {
+                                preview.to_string()
+                            };
+                            (last.timestamp, preview)
                         },
                         None => (0, "No messages yet.".into()),
                     };
-                    (timestamp, ListItem::avatar(avatar, &name, &last, None, Some(chat)))
+                    let unread = room.messages(me).any(|message| message.author != me
+                        && reads.get(&instance.id()).is_none_or(|read| !read.is_read(message)));
+                    (timestamp, ListItem::avatar(avatar, &name, &last, None, Some(chat)).with_badge(unread))
                 }).collect::<Vec<_>>();
-                items.sort_by(|a, b| b.0.cmp(&a.0));
+                items.sort_by_key(|item| std::cmp::Reverse(item.0));
                 let items = items.into_iter().map(|(_, item)| item).collect();
                 let new_message = Box::new(|ctx: &mut Context, theme: &Theme| {
-                    Flow::from_form(NewMessageFlow::new(ctx, theme))
+                    Flow::from_form(NewMessageFlow::build(ctx, theme))
                 });
                 PageType::root("Messages", vec![], vec![Display::list(None, items,
                     Some("No messages yet.\nGet started by messaging a friend."))], None,
@@ -54,13 +66,26 @@ impl MessagesHome {
             }))
     }
 }
+impl Service for MessagesHome {
+    type Init = ();
+    type Predicate = Instance<ChatRoom>;
+
+    async fn init(air: Air, _: ()) -> Self {
+        let rooms = air.instances::<ChatRoom>();
+        for room in rooms.list().into_values() {room.notify(true);}
+        Self(rooms)
+    }
+    async fn predicate(&mut self) -> Instance<ChatRoom> {self.0.next().await}
+    async fn handle(&mut self, room: Instance<ChatRoom>) {room.notify(true);}
+}
 
 pub struct NewMessageFlow;
 impl NewMessageFlow {
-    pub fn new(ctx: &mut Context, theme: &Theme) -> Form {
+    pub fn build(ctx: &mut Context, theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Search(recipients) = &state[0] else {unreachable!()};
             let mut room = ChatRoom::create(ctx, recipients.clone());
+            room.notify(true);
             FormComplete::Next(Page::messaging(ctx, &mut room))
         }) as Box<dyn FormSubmit>;
         let me = ctx.air.me();
@@ -73,13 +98,13 @@ impl NewMessageFlow {
         }).collect();
         Form::flow(theme, vec![FormItem::search("New message", "profile name", items,
             Some(vec![FormAction::Custom("New contact".into(), None, Icons::Add,
-                Action::flow(Flow::from_form(CreateAndAddContact::new(theme))))]))], None, None, submit)
+                Action::flow(Flow::from_form(CreateAndAddContact::build(theme))))]))], None, None, submit)
     }
 }
 
 struct CreateAndAddContact;
 impl CreateAndAddContact {
-    fn new(theme: &Theme) -> Form {
+    fn build(theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Text(name) = &state[0] else {unreachable!()};
             let name = Name::from_str(name).unwrap();

@@ -11,28 +11,24 @@ the mobile app does not need access to the file at runtime. An exported
 
 ## Frontend setup
 
-Frontend work lives in four sibling repositories: `orange`, `chk`, `pelican_ui`, and
-`ptsd`. Caleb owns the backend crates; Cargo downloads their published releases.
-Use the current default branches of all four frontend repositories together. This revision uses
-Prism 3.0.0 and WGPU Prism 8.0.0, including the updated layout, native keyboard, media,
-and gesture interfaces. No backend source checkout is required.
-
-Orange temporarily patches the published Ramp 3.0.0 crate with the copy in
-`vendor/ramp2` to keep the iOS keyboard open when switching text fields and
-present placeholder frames before deferred UI work such as QR generation.
-`vendor/ramp2/PATCHES.md` describes the fix; Xcode and Cargo both use this copy.
+This development checkout uses sibling repositories: CHK 2.0.0, Pelican UI 2.2.0,
+and PTSD 0.1.3. Their local changes include Orange's messaging, keyboard, and media
+features. Cargo downloads published Ramp 3.0.3, Prism 3.1.0, and backend dependencies.
+The older Ramp 3.0.0 copy in `vendor/ramp2` is not used by this dependency graph.
 
 ```sh
-mkdir orange-frontend
-cd orange-frontend
 git clone git@github.com:ramp-stack/orange.git
 git clone git@github.com:ramp-stack/chk.git
 git clone git@github.com:ramp-stack/pelican_ui.git
 git clone git@github.com:ramp-stack/ptsd.git
 cd orange
 cargo check --locked
-cargo install cargo-piston --version 0.5.7 --locked --force
+cargo install cargo-piston --version 0.5.8 --locked --force
 ```
+
+Keep the sibling checkouts together and retain the path dependencies while developing
+these local changes. Switching to Git dependencies requires migrating those changes to
+the selected Git revisions first.
 
 Restore the complete Cargo Piston identity backup supplied privately by Caleb with
 `cargo piston restore "<complete backup line>"`. Then run `cargo piston setup` in
@@ -55,7 +51,7 @@ required for iOS development; Piston reports missing prerequisites. If several
 devices match, select a number from Piston's device list, or enter `q` to cancel.
 Use `--device "<device name or UDID>"` to select one explicitly, including in scripts.
 
-For the Pelican component studio, run from the sibling `pelican_ui` checkout:
+For the Pelican component studio, clone `pelican_ui` and run from that checkout:
 
 ```sh
 cargo run --locked --features demo --bin pelican_ui
@@ -81,22 +77,40 @@ supported iOS version is 17.0.
 The legacy `orange/` Xcode project remains for reference. Cargo Piston uses the
 configuration above. Development commands do not upload to TestFlight.
 
-After changing these launch resources, rerun `cargo piston dev ios` to regenerate
-the app bundle. The generated Xcode signing project under `target/piston/` copies
-the staged bundle; rebuilding that project alone does not rebuild these resources.
+## Chat notifications
+
+Orange enables notifications for existing chats at startup and newly received chats through
+its AIR service, independently of the selected tab. Creating a chat enables notifications
+immediately. Ramp saves the notification flag when changed and restores it with the instance;
+the generic instance default remains disabled.
+
+This update uses fresh AIR instance caches. Existing server history is loaded again, but unsent
+work in the previous instance caches is not recovered. There is no cache migration; the saved
+AIR identity is retained.
+
+Build through Cargo Piston after restoring the team's developer identity. Piston retrieves
+notification credentials from the encrypted AIR developer contract and configures the selected
+Apple platform. iPhone development uses sandbox APNs; TestFlight uses production APNs and
+requires its own notification configuration.
+
+On October 29, 2026, real APNs sandbox delivery passed on an iOS 26.3 simulator: an incoming
+chat message produced a native notification with Orange stopped; tapping it reopened Orange,
+loaded the message, and rearmed its watch. This did not validate production APNs or a physical
+iPhone. Piston's simulator flow currently skips remote notification setup; that test built and
+bundled Orange directly with the development notification configuration.
 
 ## iOS FFmpeg libraries
 
-Ramp 3.0.0 uses published Maverick 5.0.0 and the shared `media2` 0.1.0 crate. Media requires
+Ramp 3.0.3 uses published Maverick 5.0.1 and the shared `media2` 0.1.1 crate. Media requires
 `ramp-ffmpeg` 9.0.4 or later and `ramp-ffmpeg-sys` 9.0.5 or later. `Cargo.lock` selects those releases
 and the 9.0.2 binary packages from crates.io. Cargo selects separate precompiled libraries for ARM64
 devices, ARM64 simulators, and Intel simulators. These builds do not compile FFmpeg
 or NASM or run Make. The legacy Xcode project selects the matching Rust static
 library for each SDK, architecture, and Debug/Release configuration.
 
-Update Orange and its sibling frontend repositories together on other machines.
-The dependency requirements prevent selecting the old sys 9.0.4 source build;
-no separate FFmpeg update command or local Maverick/FFmpeg checkout is required.
+Update the Orange checkout and use its committed lockfile on other machines. The dependency
+requirements prevent selecting the old sys 9.0.4 source build; no local backend checkout,
+FFmpeg fork, or separate FFmpeg update command is required.
 
 ## TestFlight
 

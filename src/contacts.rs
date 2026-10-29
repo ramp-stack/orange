@@ -9,7 +9,7 @@ use std::str::FromStr;
 
 pub struct ContactsHome;
 impl ContactsHome {
-    pub fn new() -> Root {
+    pub fn build() -> Root {
         Root::custom(Page::watching(Watch::list::<Profile>(),
             |ctx: &mut Context, _theme: &Theme, profiles: Vec<Instance<Profile>>| {
                 let me = ctx.air.me();
@@ -22,7 +22,7 @@ impl ContactsHome {
                 }).collect::<Vec<_>>();
                 items.sort_by(|a, b| a.title.cmp(&b.title));
                 let new_contact = Box::new(|_ctx: &mut Context, theme: &Theme| {
-                    Flow::from_form(NewContact::new(theme))
+                    Flow::from_form(NewContact::build(theme))
                 });
                 PageType::root("Contacts", vec![], vec![Display::list(None, items,
                     Some("No contacts yet.\nGet started by adding a friend."))], None,
@@ -33,7 +33,7 @@ impl ContactsHome {
 
 pub struct NewContact;
 impl NewContact {
-    pub fn new(theme: &Theme) -> Form {
+    pub fn build(theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Text(name) = &state[0] else {unreachable!()};
             let mut profile = Profile::create(ctx, Name::from_str(name).unwrap());

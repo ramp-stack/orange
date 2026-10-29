@@ -1,6 +1,6 @@
 [package]
 name = "orange"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 default-run = "orange"
 
@@ -8,24 +8,11 @@ default-run = "orange"
 ramp = {package = "ramp2", version = "3.0.3"}
 chk = {path = "../chk"}
 
-anyhow = "1"
-serde = { version = "1", features = ["derive"] }
-bitcoin = "0.32"
-bdk_wallet = "3"
-bdk_esplora = { version = "0.22", features = ["blocking"] }
-ureq = { version = "2", features = ["json"] }
-serde_json = "1"
-chrono = "0.4.44"
-unified_uri = "0.1.0"
 include_dir = "0.7.4"
 
 [lib]
 name="main"
 crate-type=["staticlib", "cdylib", "rlib"]
-
-# Published Ramp 3 with iOS focus-transfer and frame-presentation fixes.
-[patch.crates-io]
-ramp2 = { path = "vendor/ramp2" }
 
 [profile.dev.package.swash]
 opt-level = 3
