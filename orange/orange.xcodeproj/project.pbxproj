@@ -28,7 +28,7 @@
 		88C1854D307F00F100519410 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88C1854C307F00F100519410 /* ImageIO.framework */; };
 		88E18C472DDFFAD200C824BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88E18C462DDFFAD200C824BD /* Assets.xcassets */; };
 		88E18C4A2DDFFB3900C824BD /* LaunchScreenDesktop.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 88E18C492DDFFB3900C824BD /* LaunchScreenDesktop.storyboard */; platformFilters = (macos, ); };
-		88E18C4C2DE004E700C824BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 88E18C4B2DE004E700C824BD /* LaunchScreen.storyboard */; platformFilter = ios; };
+		88E18C4C2DE004E700C824BD /* OrangeLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 88E18C4B2DE004E700C824BD /* OrangeLaunchScreen.storyboard */; platformFilter = ios; };
 		88EDBAA72DE6668D00C999C7 /* PhotosUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88EDBAA62DE6668D00C999C7 /* PhotosUI.framework */; };
 /* End PBXBuildFile section */
 
@@ -68,7 +68,7 @@
 		88C1854C307F00F100519410 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		88E18C462DDFFAD200C824BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		88E18C492DDFFB3900C824BD /* LaunchScreenDesktop.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreenDesktop.storyboard; sourceTree = "<group>"; };
-		88E18C4B2DE004E700C824BD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		88E18C4B2DE004E700C824BD /* OrangeLaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = OrangeLaunchScreen.storyboard; sourceTree = "<group>"; };
 		88EDBAA62DE6668D00C999C7 /* PhotosUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotosUI.framework; path = System/Library/Frameworks/PhotosUI.framework; sourceTree = SDKROOT; };
 		96A1E5B62F48B379829E8A0D /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		9F1B41978FA53999AA836D0F /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -128,7 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				88E18C492DDFFB3900C824BD /* LaunchScreenDesktop.storyboard */,
-				88E18C4B2DE004E700C824BD /* LaunchScreen.storyboard */,
+				88E18C4B2DE004E700C824BD /* OrangeLaunchScreen.storyboard */,
 				88141E2C2DAC5A6500A08D1D /* apple-src */,
 				EB028409C2D0655412DA6E44 /* Frameworks */,
 				321F7D6A765B38E746C35105 /* Products */,
@@ -242,7 +242,7 @@
 				88E18C4A2DDFFB3900C824BD /* LaunchScreenDesktop.storyboard in Resources */,
 				88E18C472DDFFAD200C824BD /* Assets.xcassets in Resources */,
 				882605482DA9614200588BC3 /* ios.entitlements in Resources */,
-				88E18C4C2DE004E700C824BD /* LaunchScreen.storyboard in Resources */,
+				88E18C4C2DE004E700C824BD /* OrangeLaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

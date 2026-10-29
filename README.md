@@ -1,5 +1,14 @@
 # Orange
 
+## GIF configuration
+
+Put `GIPHY_API_KEY=your_key_here` in `.env` at the Orange repository root
+(beside `Cargo.toml`). This file is ignored by Git; `.env.example` is a template.
+Orange's Cargo build script reads the key for both Xcode and Cargo builds, and
+passes it to CHK's shared GIF service at startup. Rebuild after changing `.env`;
+the mobile app does not need access to the file at runtime. An exported
+`GIPHY_API_KEY` overrides the file value.
+
 ## Frontend setup
 
 Frontend work lives in four sibling repositories: `orange`, `chk`, `pelican_ui`, and
@@ -7,6 +16,11 @@ Frontend work lives in four sibling repositories: `orange`, `chk`, `pelican_ui`,
 Use the current default branches of all four frontend repositories together. This revision uses
 Prism 3.0.0 and WGPU Prism 8.0.0, including the updated layout, native keyboard, media,
 and gesture interfaces. No backend source checkout is required.
+
+Orange temporarily patches the published Ramp 3.0.0 crate with the copy in
+`vendor/ramp2` to keep the iOS keyboard open when switching text fields and
+present placeholder frames before deferred UI work such as QR generation.
+`vendor/ramp2/PATCHES.md` describes the fix; Xcode and Cargo both use this copy.
 
 ```sh
 mkdir orange-frontend
@@ -57,7 +71,7 @@ Piston generates the iPhone/iPad bundle from the Cargo configuration. The minimu
 supported iOS version is 17.0.
 
 - `icon.png` is the original Orange icon; Piston generates its required sizes.
-- `ios/LaunchScreen.storyboard` and `ios/wordmark.png` preserve the black launch
+- `ios/OrangeLaunchScreen.storyboard` and `ios/OrangeLaunchWordmark.png` preserve the black launch
   screen with the centered Orange wordmark.
 - `ios/Info.plist` contains Orange's display name, dark appearance, camera/photo
   explanations, orientations, and background declarations.
@@ -66,6 +80,10 @@ supported iOS version is 17.0.
 
 The legacy `orange/` Xcode project remains for reference. Cargo Piston uses the
 configuration above. Development commands do not upload to TestFlight.
+
+After changing these launch resources, rerun `cargo piston dev ios` to regenerate
+the app bundle. The generated Xcode signing project under `target/piston/` copies
+the staged bundle; rebuilding that project alone does not rebuild these resources.
 
 ## iOS FFmpeg libraries
 

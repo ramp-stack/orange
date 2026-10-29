@@ -1,0 +1,11 @@
+=== DEPENDENCY TREE ===
+error: package ID specification `wgpu_canvas` did not match any packages
+=== LOCKFILE ===
+=== EMOJI AND FONT REFERENCES ===
+zsh: command not found: rg
+=== FONT FILES ===
+../ramp/demo/resources/fa-solid-900.ttf
+../ramp/demo/resources/font.ttf
+../ramp/resources/font.ttf
+../wgpu_canvas/emoji_bw.ttf
+../wgpu_canvas/emoji.ttf

@@ -5,7 +5,7 @@ edition = "2024"
 default-run = "orange"
 
 [dependencies]
-ramp = {package = "ramp2", version = "3.0.0"}
+ramp = {package = "ramp2", version = "3.0.3"}
 chk = {path = "../chk"}
 
 anyhow = "1"
@@ -22,6 +22,10 @@ include_dir = "0.7.4"
 [lib]
 name="main"
 crate-type=["staticlib", "cdylib", "rlib"]
+
+# Published Ramp 3 with iOS focus-transfer and frame-presentation fixes.
+[patch.crates-io]
+ramp2 = { path = "vendor/ramp2" }
 
 [profile.dev.package.swash]
 opt-level = 3
@@ -53,11 +57,23 @@ team = "RYYG6X8WK7"
 bundle_id = "org.ramp.orange"
 minimum_os = "17.0"
 info_plist = "ios/Info.plist"
-resources = ["ios/LaunchScreen.storyboard", "ios/wordmark.png"]
-build_number = "25"
+resources = ["ios/OrangeLaunchScreen.storyboard", "ios/OrangeLaunchWordmark.png"]
+build_number = "27"
 
 [package.metadata.piston.notifications]
 enabled = true
+
+[package.metadata.piston.notifications.ios.development]
+team = "RYYG6X8WK7"
+topic = "org.ramp.orange"
+identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"
+application = "0428a9dcbf59fca2de0e55e5364800f29c00e350f62e27bf4ab9b52fe1299880"
+
+[package.metadata.piston.notifications.ios.production]
+team = "RYYG6X8WK7"
+topic = "org.ramp.orange"
+identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"
+application = "18113864cf7557c96964c4b0751e8c6550fbcb178b6198ac733bc0388ef45b95"
 
 [package.metadata.piston.macos]
 team = "RYYG6X8WK7"
@@ -65,3 +81,9 @@ team = "RYYG6X8WK7"
 [package.metadata.piston.developer]
 team = "RYYG6X8WK7"
 identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"
+
+[package.metadata.piston.testflight]
+app_id = "6746295142"
+version = "1.0.0"
+build_number = "27"
+state = "complete"

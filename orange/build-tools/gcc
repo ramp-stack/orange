@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+# FFmpeg's host generators must run on macOS. Clang otherwise interprets
+# Xcode's IPHONEOS_DEPLOYMENT_TARGET as an instruction to emit an iOS binary,
+# even when a macOS SDK is selected. Leave the parent Cargo environment intact
+# so Rust and FFmpeg's target compiler retain the app's iOS deployment minimum.
+unset IPHONEOS_DEPLOYMENT_TARGET TVOS_DEPLOYMENT_TARGET WATCHOS_DEPLOYMENT_TARGET XROS_DEPLOYMENT_TARGET
+export SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)"
+exec /usr/bin/xcrun --sdk macosx clang "$@"

@@ -19,6 +19,8 @@ impl prism::Application for Orange {
 }
 
 impl App for Orange {
+    fn giphy_api_key(&self) -> Option<&str> {option_env!("GIPHY_API_KEY")}
+
     fn roots(&self, ctx: &mut Context, theme: &Theme) -> Vec<RootInfo> {
         let messages_home = messages::MessagesHome::new();
         let contacts_home = contacts::ContactsHome::new();
