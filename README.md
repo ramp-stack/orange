@@ -11,7 +11,7 @@ the mobile app does not need access to the file at runtime. An exported
 
 ## Frontend setup
 
-This development checkout uses sibling repositories: CHK 2.0.0, Pelican UI 2.2.0,
+This development checkout uses sibling repositories: CHK 2.0.0, Pelican UI 3.0.0,
 and PTSD 0.1.3. Their local changes include Orange's messaging, keyboard, and media
 features. Cargo downloads published Ramp 3.0.3, Prism 3.1.0, and backend dependencies.
 The older Ramp 3.0.0 copy in `vendor/ramp2` is not used by this dependency graph.

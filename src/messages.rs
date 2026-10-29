@@ -1,15 +1,15 @@
 use chk::{
-    Action, AvatarContent, AvatarIconStyle, Context, Display, Flow, Form, FormAction,
+    Action, Context, Display, Flow, Form, FormAction,
     FormComplete, FormItem, FormSubmit, FormValidState, Icons, ListItem, Page, PageType, Root,
     State, Theme, Watch
 };
-use chk::air::{messages::{ChatRoom, MessageContent, RoomReadState}, profiles::Profile};
+use chk::air::{messages::{ChatRoom, RoomReadState}, profiles::Profile};
 use ramp::prism::air::{Air, Instance, Instances, Name};
 use ramp::prism::service::Service;
 
 use std::str::FromStr;
 
-pub struct MessagesHome(Instances<ChatRoom>);
+pub struct MessagesHome(Instances<ChatRoom>, Air);
 impl MessagesHome {
     pub fn build() -> Root {
         Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>(), Watch::list::<RoomReadState>()),
@@ -19,36 +19,19 @@ impl MessagesHome {
                     let read = instance.pending();
                     (read.owner == me).then(|| (read.room, read.clone()))
                 }).collect::<std::collections::HashMap<_, _>>();
-                let mut items = rooms.into_iter().map(|mut instance| {
+                let mut items = rooms.into_iter().filter(|room| room.pending().members.contains(&me)).map(|mut instance| {
                     let chat = Flow::new(vec![Page::messaging(ctx, &mut instance)]);
                     let room = instance.pending();
                     let members = room.members.iter().copied().filter(|name| *name != me).collect::<Vec<_>>();
                     let name = room.name(ctx);
-                    let avatar = if members.len() > 1 {
-                        AvatarContent::icon(Icons::Group, AvatarIconStyle::Secondary)
+                    let avatar = if room.is_group() {
+                        room.group_details().photo
                     } else {
                         let profile = Profile::from_name(ctx, members.first().copied().unwrap_or(me));
                         profile.pending().avatar.clone()
                     };
                     let (timestamp, last) = match room.messages(me).last() {
-                        Some(last) => {
-                            let preview = match &last.body {
-                                MessageContent::Text(text) => text.as_str(),
-                                MessageContent::Sticker(_) => "Sticker",
-                                MessageContent::Gif(_) => "GIF",
-                                MessageContent::Photo(_) => "Photo",
-                                MessageContent::Video(_) => "Video",
-                            };
-                            let preview = if last.author == me {
-                                format!("You: {preview}")
-                            } else if members.len() > 1 {
-                                let author = Profile::from_name(ctx, last.author).pending().username.clone();
-                                format!("{author}: {preview}")
-                            } else {
-                                preview.to_string()
-                            };
-                            (last.timestamp, preview)
-                        },
+                        Some(last) => (last.timestamp, last.preview(ctx, room.is_group())),
                         None => (0, "No messages yet.".into()),
                     };
                     let unread = room.messages(me).any(|message| message.author != me
@@ -72,11 +55,35 @@ impl Service for MessagesHome {
 
     async fn init(air: Air, _: ()) -> Self {
         let rooms = air.instances::<ChatRoom>();
-        for room in rooms.list().into_values() {room.notify(true);}
-        Self(rooms)
+        for room in rooms.list().into_values() {air.start::<RoomNotifications>(room);}
+        Self(rooms, air)
     }
     async fn predicate(&mut self) -> Instance<ChatRoom> {self.0.next().await}
-    async fn handle(&mut self, room: Instance<ChatRoom>) {room.notify(true);}
+    async fn handle(&mut self, room: Instance<ChatRoom>) {self.1.start::<RoomNotifications>(room);}
+}
+
+// Watch membership even when the conversation is hidden or this device receives
+// a leave/rejoin from another device. Only change the push subscription on a transition.
+struct RoomNotifications {room: Instance<ChatRoom>, me: Name, enabled: bool}
+impl Service for RoomNotifications {
+    type Init = Instance<ChatRoom>;
+    type Predicate = bool;
+    async fn init(air: Air, room: Self::Init) -> Self {
+        let me = air.me();
+        let enabled = room.pending().members.contains(&me);
+        room.notify(enabled);
+        Self {room, me, enabled}
+    }
+    async fn predicate(&mut self) -> bool {
+        self.room.next().await;
+        self.room.pending().members.contains(&self.me)
+    }
+    async fn handle(&mut self, enabled: bool) {
+        if enabled != self.enabled {
+            self.room.notify(enabled);
+            self.enabled = enabled;
+        }
+    }
 }
 
 pub struct NewMessageFlow;
