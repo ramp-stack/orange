@@ -7,7 +7,7 @@ use chk::air::{messages::{ChatRoom, RoomReadState}, profiles::Profile};
 use ramp::prism::air::{Air, Instance, Instances, Name};
 use ramp::prism::service::Service;
 
-use std::str::FromStr;
+use crate::contact_links::parse_contact;
 
 type MessageLists = (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>, Vec<Instance<RoomReadState>>);
 
@@ -116,8 +116,8 @@ impl CreateAndAddContact {
     fn build(theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Text(name) = &state[0] else {unreachable!()};
-            let name = Name::from_str(name).unwrap();
-            Profile::create(ctx, name);
+            let Some(name) = parse_contact(name) else {return FormComplete::None};
+            Profile::from_name(ctx, name);
             FormComplete::Return(Box::new(move |ctx: &mut Context, theme: &Theme| {
                 (Action::choose_search(name).get())(ctx, theme)
             }))
@@ -126,8 +126,8 @@ impl CreateAndAddContact {
             FormAction::Paste, FormAction::scan_qr_code("Scan a profile QR code"),
         ]), |_ctx: &mut Context, name: String| {
             if name.is_empty() {FormValidState::Invalid}
-            else if Name::from_str(&name).is_ok() {FormValidState::Valid}
-            else {FormValidState::InvalidWithData("Not a valid Orange Name.".into())}
+            else if parse_contact(&name).is_some() {FormValidState::Valid}
+            else {FormValidState::InvalidWithData("Not a valid Orange name or contact link.".into())}
         })], None, None, submit)
     }
 }

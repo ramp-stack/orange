@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleURLTypes</key>
+    <array><dict>
+        <key>CFBundleURLName</key><string>org.ramp.orange.contact</string>
+        <key>CFBundleURLSchemes</key><array><string>orange-contact</string></array>
+        <key>CFBundleTypeRole</key><string>Viewer</string>
+    </dict></array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>org.ramp.mobile.refresh</string>

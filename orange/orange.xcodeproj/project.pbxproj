@@ -212,6 +212,11 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					3BDB8152E4962373181B4FE5 = {
+						SystemCapabilities = {
+							com.apple.AssociatedDomains = { enabled = 1; };
+						};
+					};
 					D08AEBE0B1A9C9A7B8C7B33F = {
 						LastSwiftMigration = 1620;
 					};

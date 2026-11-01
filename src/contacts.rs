@@ -3,9 +3,8 @@ use chk::{
     FormValidState, ListItem, Page, PageType, Root, State, Theme, Watch
 };
 use chk::air::profiles::Profile;
-use ramp::prism::air::{Instance, Name};
-
-use std::str::FromStr;
+use ramp::prism::air::Instance;
+use crate::contact_links::parse_contact;
 
 pub struct ContactsHome;
 impl ContactsHome {
@@ -36,18 +35,19 @@ impl NewContact {
     pub fn build(theme: &Theme) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
             let State::Text(name) = &state[0] else {unreachable!()};
-            let mut profile = Profile::create(ctx, Name::from_str(name).unwrap());
+            let Some(name) = parse_contact(name) else {return FormComplete::None};
+            let mut profile = Profile::from_name(ctx, name);
             FormComplete::Next(Page::profile(ctx, &mut profile))
         }) as Box<dyn FormSubmit>;
         Form::flow(theme, vec![FormItem::text("New contact", "orange name", Some(vec![
             FormAction::Paste, FormAction::scan_qr_code("Scan a profile QR code"),
         ]), |ctx: &mut Context, name: String| {
             if name.is_empty() {FormValidState::Invalid}
-            else {match Name::from_str(&name) {
-                Ok(name) if name == ctx.air.me() => FormValidState::InvalidWithData(
+            else {match parse_contact(&name) {
+                Some(name) if name == ctx.air.me() => FormValidState::InvalidWithData(
                     "You cannot add yourself as a contact.".into()),
-                Ok(_) => FormValidState::Valid,
-                Err(_) => FormValidState::InvalidWithData("This is not a valid orange name.".into()),
+                Some(_) => FormValidState::Valid,
+                None => FormValidState::InvalidWithData("This is not a valid Orange name or contact link.".into()),
             }}
         })], None, None, submit)
     }

@@ -5,8 +5,20 @@ use prism::drawable::Drawable;
 mod messages;
 mod contacts;
 mod profile;
+mod contact_links;
+#[cfg(target_os = "ios")]
+mod ios_links;
 
+#[cfg(not(target_os = "ios"))]
 ramp::run!(Orange);
+
+#[cfg(target_os = "ios")]
+#[unsafe(no_mangle)]
+pub extern "C" fn maverick_main() {
+    // Install before UIKit finishes launching so cold-start invitations aren't lost.
+    ios_links::prepare();
+    ramp::maverick_os::MaverickOS::<ramp::Ramp<Orange>>::start();
+}
 
 pub struct Orange;
 
@@ -15,7 +27,9 @@ impl prism::Application for Orange {
 
     fn new(ctx: &mut Context) -> impl Drawable {
         ctx.air.start::<messages::MessagesHome>(());
-        Orange.build(ctx, Assets::new(vec![include_dir::include_dir!("$CARGO_MANIFEST_DIR/resources")]))
+        let assets = Assets::new(vec![include_dir::include_dir!("$CARGO_MANIFEST_DIR/resources")]);
+        let theme = Orange.theme().to_pelican(assets.clone());
+        contact_links::ContactLinks::new(Orange.build(ctx, assets), theme)
     }
 }
 

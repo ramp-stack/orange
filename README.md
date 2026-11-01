@@ -27,6 +27,11 @@ Keep the committed `Cargo.lock`; no `cargo update` is needed. Clone the other fr
 repositories only when editing them. Use local Cargo overrides for related development and
 keep those overrides out of release manifests.
 
+In the local `/Users/ellamae/ramp` workspace, the parent `.cargo/config.toml` patches
+CHK, Pelican UI, and PTSD to their sibling checkouts. This preserves local UI edits
+while using the published backend fixes. Run Cargo from inside this workspace; local
+lockfiles reflect these path overrides.
+
 Restore the complete Cargo Piston identity backup supplied privately by Caleb with
 `cargo piston restore "<complete backup line>"`. Then run `cargo piston setup` in
 `orange` and select team `RYYG6X8WK7`. Keep the backup out of Git, screenshots, and
