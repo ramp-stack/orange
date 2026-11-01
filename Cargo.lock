@@ -788,6 +788,7 @@ checksum = "4b4b0fc281743d80256607bd65e8beedc42cb0787ea119c85b81b4c0eab85e5f"
 [[package]]
 name = "chk"
 version = "2.0.0"
+source = "git+https://github.com/ramp-stack/chk?rev=2da2ba12e6973c17ffa7d8e70dc218d342552fdf#2da2ba12e6973c17ffa7d8e70dc218d342552fdf"
 dependencies = [
  "dyn-clone",
  "futures",
@@ -3867,15 +3868,28 @@ dependencies = [
 name = "orange"
 version = "1.0.1"
 dependencies = [
+ "air",
+ "air_server",
  "async-channel",
+ "base64 0.22.1",
  "block2 0.6.2",
  "chk",
+ "chrono",
+ "crossfire",
  "futures",
  "include_dir",
+ "media2",
  "objc2 0.6.5",
  "objc2-foundation 0.3.2",
  "objc2-ui-kit 0.3.2",
+ "pelican_ui",
+ "postcard",
  "ramp2",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tokio",
+ "ureq",
 ]
 
 [[package]]
@@ -3970,6 +3984,7 @@ checksum = "2ee67f1008b1ba2321834326597b8e186293b049a023cdef258527550b9935b4"
 [[package]]
 name = "pelican_ui"
 version = "3.0.0"
+source = "git+https://github.com/ramp-stack/pelican_ui?rev=4522d2919738a6e042faa530c3f04f8bca66a5cf#4522d2919738a6e042faa530c3f04f8bca66a5cf"
 dependencies = [
  "bardecoder",
  "base64 0.22.1",
@@ -4263,6 +4278,7 @@ checksum = "3d595e54a326bc53c1c197b32d295e14b169e3cfeaa8dc82b529f947fba6bcf5"
 [[package]]
 name = "ptsd2"
 version = "0.2.0"
+source = "git+https://github.com/ramp-stack/ptsd?rev=965e94c3094e0e871381b34d9b0ba9976232b10e#965e94c3094e0e871381b34d9b0ba9976232b10e"
 dependencies = [
  "chrono",
  "downcast-rs 2.0.2",
