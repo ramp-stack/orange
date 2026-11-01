@@ -9,6 +9,13 @@ mod contact_links;
 #[cfg(target_os = "ios")]
 mod ios_links;
 
+#[cfg(not(any(target_os = "ios", target_os = "android", target_arch = "wasm32")))]
+mod cli;
+#[cfg(not(any(target_os = "ios", target_os = "android", target_arch = "wasm32")))]
+mod console;
+#[cfg(not(any(target_os = "ios", target_os = "android", target_arch = "wasm32")))]
+pub use cli::{cli_requested, run as run_cli};
+
 #[cfg(not(target_os = "ios"))]
 ramp::run!(Orange);
 
@@ -29,7 +36,13 @@ impl prism::Application for Orange {
         ctx.air.start::<messages::MessagesHome>(());
         let assets = Assets::new(vec![include_dir::include_dir!("$CARGO_MANIFEST_DIR/resources")]);
         let theme = Orange.theme().to_pelican(assets.clone());
-        contact_links::ContactLinks::new(Orange.build(ctx, assets), theme)
+        let app = contact_links::ContactLinks::new(Orange.build(ctx, assets), theme.clone());
+        // Desktop only. While closed, this wrapper forwards layout, drawing, and
+        // input unchanged; it draws only after Ctrl+Alt+Shift+O.
+        #[cfg(not(any(target_os = "ios", target_os = "android", target_arch = "wasm32")))]
+        {console::Console::new(app, &theme)}
+        #[cfg(any(target_os = "ios", target_os = "android", target_arch = "wasm32"))]
+        {app}
     }
 }
 
