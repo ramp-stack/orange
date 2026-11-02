@@ -9,14 +9,10 @@ ramp = {package = "ramp2", version = "3.0.4"}
 chk = {version = "2.0.0", git = "https://github.com/ramp-stack/chk", rev = "2da2ba12e6973c17ffa7d8e70dc218d342552fdf"}
 
 include_dir = "0.7.4"
-async-channel = "2.5"
-futures = "0.3"
 
-[target.'cfg(target_os = "ios")'.dependencies]
-objc2 = "0.6"
-block2 = "0.6"
-objc2-foundation = { version = "0.3", features = ["NSNotification", "NSUserActivity", "NSURL", "NSDictionary", "NSString"] }
-objc2-ui-kit = { version = "0.3", features = ["UIApplication", "UIResponder"] }
+# Local Maverick branch contains the extracted Apple app-link bridge.
+[patch.crates-io]
+maverick_os = {path = "../maverick_os"}
 
 [lib]
 name="main"
@@ -54,7 +50,7 @@ minimum_os = "17.0"
 info_plist = "ios/Info.plist"
 entitlements = "ios/Orange.entitlements"
 resources = ["ios/OrangeLaunchScreen.storyboard", "ios/OrangeLaunchWordmark.png"]
-build_number = "29"
+build_number = "30"
 
 [package.metadata.piston.notifications]
 enabled = true
@@ -81,5 +77,5 @@ identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"
 [package.metadata.piston.testflight]
 app_id = "6746295142"
 version = "1.0.1"
-build_number = "29"
+build_number = "30"
 state = "complete"

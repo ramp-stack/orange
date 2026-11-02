@@ -22,11 +22,30 @@ Someone who installs the app afterwards must tap the invitation again.
   only `/invite.html` with a `name` query parameter.
 - Existing TestFlight installations need a new app build to receive this feature.
 
-Orange installs a forwarding UIKit application delegate at launch, preserving the
-existing runtime delegate and notification delegate chain. Incoming links queue
-until the UI is ready. Runtime and UI dependency crates are not modified.
+Orange owns `chk::Invitations<Name>` as a normal field. Its format, parser, and
+DM-opening handler are methods on `Orange` in `src/lib.rs`; there is no global
+invitation instance. Cloned handles share the same CHK inbox across the UI and
+native receiver. CHK queues delivery until the UI is ready and invokes Orange's
+handler; other apps supply their own payloads and handlers.
 
-## Verification (2026-11-01)
+The iOS entry point holds an `AppLinks::prepare()` guard around runtime startup.
+Maverick temporarily queues URLs received before Orange exists. Once constructed,
+Orange attaches a closure with `AppLinks::listen`, which drains those URLs into
+its own inbox. The forwarding delegate preserves the runtime and push callbacks.
+
+The local `feature/apple-app-links` branches in Orange and Maverick OS are paired:
+Orange's crates.io patch selects `../maverick_os` until the bridge is released.
+
+## Maverick extraction verification (2026-11-01)
+
+- `cargo test --locked --offline --lib`: 2 tests passed, including queuing links
+  before the UI is ready and rejecting invalid invitation URLs.
+- `cargo check --locked --offline --lib --target aarch64-apple-ios`: passed.
+- `cargo build --locked --offline --lib --target aarch64-apple-ios`: passed with
+  the local Maverick bridge. Device link-opening and notification delivery were
+  not rerun after this extraction.
+
+## Verification before the Maverick extraction (2026-11-01)
 
 - `cargo test --locked --offline --lib`: 2 tests passed.
 - `cargo check --locked --offline --lib --target aarch64-apple-ios`: passed.

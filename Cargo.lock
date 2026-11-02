@@ -789,6 +789,7 @@ checksum = "4b4b0fc281743d80256607bd65e8beedc42cb0787ea119c85b81b4c0eab85e5f"
 name = "chk"
 version = "2.0.0"
 dependencies = [
+ "async-channel",
  "dyn-clone",
  "futures",
  "pelican_ui",
@@ -2885,8 +2886,6 @@ dependencies = [
 [[package]]
 name = "maverick_os"
 version = "5.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb8c5ee6c1a59392ec3e0e20bfd2667562610c3566d50eb7ee62c4d8de924598"
 dependencies = [
  "android_logger",
  "arboard",
@@ -3867,14 +3866,8 @@ dependencies = [
 name = "orange"
 version = "1.0.1"
 dependencies = [
- "async-channel",
- "block2 0.6.2",
  "chk",
- "futures",
  "include_dir",
- "objc2 0.6.5",
- "objc2-foundation 0.3.2",
- "objc2-ui-kit 0.3.2",
  "ramp2",
 ]
 

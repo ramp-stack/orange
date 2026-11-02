@@ -1,21 +1,21 @@
 use chk::{
-    Action, Context, Display, Flow, Form, FormAction,
-    FormComplete, FormItem, FormSubmit, FormValidState, Icons, ListItem, Page, PageType, Root,
-    State, Theme, Watch
+    Action, Bumper, Context, Display, Flow, Form, FormAction,
+    FormComplete, FormItem, FormSubmit, FormValidState, Icons, ListItem, Offset, Page, PageType, Root,
+    Selector, State, Theme, Watch
 };
 use chk::air::{messages::{ChatRoom, RoomReadState}, profiles::Profile};
 use ramp::prism::air::{Air, Instance, Instances, Name};
 use ramp::prism::service::Service;
 
-use crate::contact_links::parse_contact;
+use chk::Invitations;
 
 type MessageLists = (Vec<Instance<ChatRoom>>, Vec<Instance<Profile>>, Vec<Instance<RoomReadState>>);
 
 pub struct MessagesHome(Instances<ChatRoom>, Air);
 impl MessagesHome {
-    pub fn build() -> Root {
+    pub fn build(invitations: Invitations<Name>) -> Root {
         Root::custom(Page::watching((Watch::list::<ChatRoom>(), Watch::list::<Profile>(), Watch::list::<RoomReadState>()),
-            |ctx: &mut Context, _theme: &Theme, (rooms, _, reads): MessageLists| {
+            move |ctx: &mut Context, _theme: &Theme, (rooms, _, reads): MessageLists| {
                 let me = ctx.air.me();
                 let reads = reads.into_iter().filter_map(|instance| {
                     let read = instance.pending();
@@ -42,8 +42,9 @@ impl MessagesHome {
                 }).collect::<Vec<_>>();
                 items.sort_by_key(|item| std::cmp::Reverse(item.0));
                 let items = items.into_iter().map(|(_, item)| item).collect();
-                let new_message = Box::new(|ctx: &mut Context, theme: &Theme| {
-                    Flow::from_form(NewMessageFlow::build(ctx, theme))
+                let message_invitations = invitations.clone();
+                let new_message = Box::new(move |ctx: &mut Context, theme: &Theme| {
+                    Flow::from_form(NewMessageFlow::build(ctx, theme, message_invitations.clone()))
                 });
                 PageType::root("Messages", vec![], vec![Display::list(None, items,
                     Some("No messages yet.\nGet started by messaging a friend."))], None,
@@ -90,44 +91,168 @@ impl Service for RoomNotifications {
 
 pub struct NewMessageFlow;
 impl NewMessageFlow {
-    pub fn build(ctx: &mut Context, theme: &Theme) -> Form {
+    pub fn build(ctx: &mut Context, theme: &Theme, invitations: Invitations<Name>) -> Form {
         let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
-            let State::Search(recipients) = &state[0] else {unreachable!()};
-            let mut room = ChatRoom::create(ctx, recipients.clone());
+            let Some(State::Selection(keys)) = state.first() else {
+                return FormComplete::None;
+            };
+            let recipients = match selected_recipients(keys) {
+                Ok(recipients) => recipients,
+                Err(error) => {
+                    return FormComplete::Next(Page::Static(Box::new(PageType::display(
+                        "New message",
+                        vec![Display::instructions(error)],
+                        None,
+                        Bumper::Done,
+                        Offset::Center,
+                    ))));
+                }
+            };
+            let mut room = ChatRoom::create(ctx, recipients);
             room.notify(true);
             FormComplete::Next(Page::messaging(ctx, &mut room))
         }) as Box<dyn FormSubmit>;
         let me = ctx.air.me();
-        let items = ctx.air.instances::<Profile>().list().into_values().map(|profile| {
-            let profile = profile.pending();
-            let username = if profile.name == Some(me) {format!("{} (You)", profile.username)}
-                else {profile.username.clone()};
-            (ListItem::avatar(profile.avatar.clone(), &username, &profile.name(), None, None),
-                profile.name.unwrap())
-        }).collect();
-        Form::flow(theme, vec![FormItem::search("New message", "profile name", items,
-            Some(vec![FormAction::Custom("New contact".into(), None, Icons::Add,
-                Action::flow(Flow::from_form(CreateAndAddContact::build(theme))))]))], None, None, submit)
+        let items = ctx
+            .air
+            .instances::<Profile>()
+            .list()
+            .into_values()
+            .filter_map(|profile| profile_row(&profile.pending(), me))
+            .collect();
+        let selector = Selector::new("profile name", items);
+        let add_contact = CreateAndAddContact::build(theme, invitations, selector.clone());
+        let selector = selector.with_actions(vec![FormAction::Custom(
+            "New contact".into(),
+            None,
+            Icons::Add,
+            Action::flow(Flow::from_form(add_contact)),
+        )]);
+        Form::flow(
+            theme,
+            vec![FormItem::selection("New message", selector)],
+            None,
+            None,
+            submit,
+        )
     }
+}
+
+/// Keys belong to the generic UI; parse the entire selection before creating a room.
+/// Invalid keys must never silently turn an intended group into a smaller audience.
+fn selected_recipients(keys: &[String]) -> Result<Vec<Name>, &'static str> {
+    if keys.is_empty() {
+        return Err("Choose at least one contact.");
+    }
+    let mut recipients = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for key in keys {
+        let name = key
+            .parse::<Name>()
+            .map_err(|_| "One of the selected contacts is invalid. Choose your contacts again.")?;
+        if seen.insert(name) {
+            recipients.push(name);
+        }
+    }
+    Ok(recipients)
+}
+
+fn profile_row(profile: &Profile, me: Name) -> Option<(ListItem, String)> {
+    let name = profile.name?;
+    let username = if name == me {
+        format!("{} (You)", profile.username)
+    } else {
+        profile.username.clone()
+    };
+    Some((
+        ListItem::avatar(
+            profile.avatar.clone(),
+            &username,
+            &profile.name(),
+            None,
+            None,
+        ),
+        name.to_string(),
+    ))
 }
 
 struct CreateAndAddContact;
 impl CreateAndAddContact {
-    fn build(theme: &Theme) -> Form {
-        let submit = Box::new(|ctx: &mut Context, state: &Vec<State>| {
-            let State::Text(name) = &state[0] else {unreachable!()};
-            let Some(name) = parse_contact(name) else {return FormComplete::None};
-            Profile::from_name(ctx, name);
+    fn build(theme: &Theme, invitations: Invitations<Name>, selector: Selector) -> Form {
+        let submit_invitations = invitations.clone();
+        let submit = Box::new(move |ctx: &mut Context, state: &Vec<State>| {
+            let Some(State::Text(name)) = state.first() else {
+                return FormComplete::None;
+            };
+            let Some(name) = submit_invitations.parse_contact(name) else {
+                return FormComplete::None;
+            };
+            let profile = Profile::from_name(ctx, name);
+            let Some((row, key)) = profile_row(&profile.pending(), ctx.air.me()) else {
+                return FormComplete::None;
+            };
+            let select = selector.select(row, key);
             FormComplete::Return(Box::new(move |ctx: &mut Context, theme: &Theme| {
-                (Action::choose_search(name).get())(ctx, theme)
+                (select.get())(ctx, theme)
             }))
         }) as Box<dyn FormSubmit>;
-        Form::flow(theme, vec![FormItem::text("New contact", "orange name", Some(vec![
-            FormAction::Paste, FormAction::scan_qr_code("Scan a profile QR code"),
-        ]), |_ctx: &mut Context, name: String| {
-            if name.is_empty() {FormValidState::Invalid}
-            else if parse_contact(&name).is_some() {FormValidState::Valid}
-            else {FormValidState::InvalidWithData("Not a valid Orange name or contact link.".into())}
-        })], None, None, submit)
+        Form::flow(
+            theme,
+            vec![FormItem::text(
+                "New contact",
+                "orange name",
+                Some(vec![
+                    FormAction::Paste,
+                    FormAction::scan_qr_code("Scan a profile QR code"),
+                ]),
+                move |_ctx: &mut Context, name: String| {
+                    if name.is_empty() {
+                        FormValidState::Invalid
+                    } else if invitations.parse_contact(&name).is_some() {
+                        FormValidState::Valid
+                    } else {
+                        FormValidState::InvalidWithData(
+                            "Not a valid Orange name or contact link.".into(),
+                        )
+                    }
+                },
+            )],
+            None,
+            None,
+            submit,
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn contact_names() -> (Name, Name) {
+        (
+            "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+                .parse()
+                .unwrap(),
+            "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+                .parse()
+                .unwrap(),
+        )
+    }
+
+    #[test]
+    fn selection_keys_round_trip_and_deduplicate_in_selection_order() {
+        let (first, second) = contact_names();
+        assert_eq!(
+            selected_recipients(&[second.to_string(), first.to_string(), second.to_string()]),
+            Ok(vec![second, first])
+        );
+    }
+
+    #[test]
+    fn invalid_or_empty_selection_never_becomes_a_partial_recipient_list() {
+        let (first, _) = contact_names();
+        assert!(selected_recipients(&[]).is_err());
+        assert!(selected_recipients(&[first.to_string(), "invalid contact".into()]).is_err());
+        assert!(selected_recipients(&[String::new(), first.to_string()]).is_err());
     }
 }
