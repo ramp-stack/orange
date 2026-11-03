@@ -1,13 +1,13 @@
 # Contact invitations
 
-The self profile has **Share** under the **Orange name** data item. The QR page's
+The self profile has **Share** under the **AirName** data item. The QR page's
 **Share** action shares the same invitation link; **Copy** still copies the raw name.
-It shares `https://orange.me/invite.html?name=<public Orange name>`.
+It shares `https://orange.me/invite.html?name=<public AirName>`.
 Only the public identity is shared; the link contains no private key or credentials.
 
 Opening the link in an updated iOS app uses the existing CHK direct-message action,
 including its existing-room lookup. It does not send a message automatically.
-New-contact forms also accept the full invitation URL or a raw Orange name.
+New-contact forms also accept the full invitation URL or a raw AirName.
 The website's **Open in Orange** button uses `orange-contact://contact/<name>`.
 Someone who installs the app afterwards must tap the invitation again.
 
@@ -22,19 +22,25 @@ Someone who installs the app afterwards must tap the invitation again.
   only `/invite.html` with a `name` query parameter.
 - Existing TestFlight installations need a new app build to receive this feature.
 
-Orange owns `chk::Invitations<Name>` as a normal field. Its format, parser, and
-DM-opening handler are methods on `Orange` in `src/lib.rs`; there is no global
-invitation instance. Cloned handles share the same CHK inbox across the UI and
-native receiver. CHK queues delivery until the UI is ready and invokes Orange's
-handler; other apps supply their own payloads and handlers.
+Orange implements `chk::App::invitations` once, returning `Invitations<Name>`
+with its URL builder, parser, and received-invitation action. CHK creates and owns
+this setup, registers it through the hardware abstraction, queues incoming links,
+and executes the action on the UI thread. Different apps can use other payloads
+and actions; opening a DM is Orange's choice.
 
-The iOS entry point holds an `AppLinks::prepare()` guard around runtime startup.
-Maverick temporarily queues URLs received before Orange exists. Once constructed,
-Orange attaches a closure with `AppLinks::listen`, which drains those URLs into
-its own inbox. The forwarding delegate preserves the runtime and push callbacks.
+Orange uses `chk::presets::ChatPresets` for messages, contacts, and its self profile.
+The presets own contact entry, invitation sharing, QR presentation, and message
+notification subscriptions; Orange no longer defines its own contact or message
+home pages.
 
-The local `feature/apple-app-links` branches in Orange and Maverick OS are paired:
-Orange's crates.io patch selects `../maverick_os` until the bridge is released.
+`ramp::run!(chk::Application<Orange>)` starts the app. Maverick owns early native
+link registration inside its event-loop startup, preserving cold-start URLs and
+push delegate forwarding. Orange and CHK have no platform-specific link setup.
+The iOS implementation is in Maverick's `src/hardware/ios.rs`; macOS, Linux, and
+Android currently report native app links unavailable with TODO receiver stubs.
+
+Local Cargo patches select the Maverick, Prism, and Ramp branches until those
+hardware changes are released. CHK uses the matching local Prism hardware facade.
 
 ## Maverick extraction verification (2026-11-01)
 

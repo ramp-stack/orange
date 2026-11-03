@@ -10,9 +10,11 @@ chk = {version = "2.0.0", git = "https://github.com/ramp-stack/chk", rev = "2da2
 
 include_dir = "0.7.4"
 
-# Local Maverick branch contains the extracted Apple app-link bridge.
+# Local branches expose app links through the hardware abstraction.
 [patch.crates-io]
 maverick_os = {path = "../maverick_os"}
+prism2 = {path = "../prism"}
+ramp2 = {path = "../ramp"}
 
 [lib]
 name="main"

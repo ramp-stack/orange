@@ -2,12 +2,19 @@
 
 ## GIF configuration
 
-Put `GIPHY_API_KEY=your_key_here` in `.env` at the Orange repository root
-(beside `Cargo.toml`). This file is ignored by Git; `.env.example` is a template.
-Orange's Cargo build script reads the key for both Xcode and Cargo builds, and
-passes it to CHK's shared GIF service at startup. Rebuild after changing `.env`;
-the mobile app does not need access to the file at runtime. An exported
-`GIPHY_API_KEY` overrides the file value.
+CHK reads `option_env!("GIPHY_API_KEY")` when CHK itself is compiled. Export the
+variable before building, or create `.cargo/config.toml` inside Orange:
+
+```toml
+[env]
+GIPHY_API_KEY = "your_key_here"
+```
+
+This local configuration is ignored by Git and supplies the key to dependency
+builds as well as Orange. An exported `GIPHY_API_KEY` overrides the file value.
+Run Cargo from the Orange directory so it discovers this configuration. Rebuild
+after changing the key; the mobile app does not need the file at runtime.
+The previous `.env` file is no longer read automatically.
 
 ## Frontend setup
 

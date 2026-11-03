@@ -792,6 +792,7 @@ dependencies = [
  "async-channel",
  "dyn-clone",
  "futures",
+ "include_dir",
  "pelican_ui",
  "prism2",
  "ptsd2",
@@ -4191,8 +4192,6 @@ checksum = "e8cf8e6a8aa66ce33f63993ffc4ea4271eb5b0530a9002db8455ea6050c77bfa"
 [[package]]
 name = "prism2"
 version = "3.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b4de1c17b00613fc65d31ba782ba53179293dbe96ec0f8d862a8370fa034073"
 dependencies = [
  "air",
  "downcast-rs 2.0.2",
@@ -4459,8 +4458,6 @@ dependencies = [
 [[package]]
 name = "ramp2"
 version = "3.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1713cfc6916e1ecc65ae0f1db6c82463b3205f4da64fa5d0e25b382734e9c8d"
 dependencies = [
  "air",
  "air_notifications",
