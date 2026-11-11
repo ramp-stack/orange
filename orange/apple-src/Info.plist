@@ -33,7 +33,9 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Record audio with your camera and microphone.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This app uses the camera to scan QR codes.</string>
+	<string>Take photos to attach to messages and scan QR codes.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save photos, stickers, GIFs, and videos from messages to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow access to your photo library to choose a new avatar.</string>
 	<key>UIBackgroundModes</key>

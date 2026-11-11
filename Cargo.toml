@@ -52,7 +52,7 @@ minimum_os = "17.0"
 info_plist = "ios/Info.plist"
 entitlements = "ios/Orange.entitlements"
 resources = ["ios/OrangeLaunchScreen.storyboard", "ios/OrangeLaunchWordmark.png"]
-build_number = "30"
+build_number = "31"
 
 [package.metadata.piston.notifications]
 enabled = true
@@ -79,5 +79,5 @@ identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"
 [package.metadata.piston.testflight]
 app_id = "6746295142"
 version = "1.0.1"
-build_number = "30"
-state = "complete"
+build_number = "31"
+state = "uploaded"
