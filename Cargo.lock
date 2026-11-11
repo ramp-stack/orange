@@ -1307,9 +1307,7 @@ checksum = "117240f60069e65410b3ae1bb213295bd828f707b5bec6596a1afc8793ce0cbc"
 
 [[package]]
 name = "dpi"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
+version = "0.1.1"
 
 [[package]]
 name = "dyn-clone"
@@ -4406,8 +4404,6 @@ dependencies = [
 [[package]]
 name = "ramp-winit"
 version = "0.30.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6b3b191f1e8adc40ecef2ff2325afb06c4a71388e8c719daf311de86c5bd11e"
 dependencies = [
  "ahash",
  "android-activity",
