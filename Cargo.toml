@@ -6,7 +6,7 @@ default-run = "orange"
 
 [dependencies]
 ramp = {package = "ramp2", version = "3.0.4"}
-chk = {version = "2.0.0", git = "https://github.com/ramp-stack/chk", rev = "2da2ba12e6973c17ffa7d8e70dc218d342552fdf"}
+chk = { features = ["pelican_ui"], version = "2.0.0", git = "https://github.com/ramp-stack/chk", rev = "2da2ba12e6973c17ffa7d8e70dc218d342552fdf"}
 
 include_dir = "0.7.4"
 
@@ -53,7 +53,7 @@ minimum_os = "17.0"
 info_plist = "ios/Info.plist"
 entitlements = "ios/Orange.entitlements"
 resources = ["ios/OrangeLaunchScreen.storyboard", "ios/OrangeLaunchWordmark.png"]
-build_number = "31"
+build_number = "33"
 
 [package.metadata.piston.notifications]
 enabled = true
@@ -80,5 +80,5 @@ identity = "023c8a09189d12e0755e224a9e8a6af15b21186758aef12e65b0231757dd3bdee0"
 [package.metadata.piston.testflight]
 app_id = "6746295142"
 version = "1.0.1"
-build_number = "31"
-state = "uploaded"
+build_number = "33"
+state = "complete"

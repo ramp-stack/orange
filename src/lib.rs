@@ -7,6 +7,7 @@ ramp::run!(chk::Application<Orange>);
 pub struct Orange;
 
 impl App for Orange {
+    type DesignSystem = chk::PelicanUi;
     type Invitation = Name;
 
     fn name() -> String {"Orange".into()}
@@ -29,7 +30,7 @@ impl App for Orange {
             },
             |ctx, name| {
                 chk::profiles::Profile::from_name(ctx, name);
-                chk::presets::ChatPresets::message(name)
+                chk::Action::message(name)
             },
         ))
     }

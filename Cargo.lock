@@ -789,9 +789,7 @@ checksum = "4b4b0fc281743d80256607bd65e8beedc42cb0787ea119c85b81b4c0eab85e5f"
 name = "chk"
 version = "2.0.0"
 dependencies = [
- "async-channel",
  "dyn-clone",
- "futures",
  "include_dir",
  "pelican_ui",
  "prism2",
@@ -3964,16 +3962,13 @@ name = "pelican_ui"
 version = "3.0.0"
 dependencies = [
  "bardecoder",
- "base64 0.22.1",
  "futures",
- "hex",
  "image 0.24.9",
  "include_dir",
  "media2",
  "prism2",
  "ptsd2",
  "qrcode",
- "serde",
  "serde_json",
  "unicode-segmentation",
  "ureq",
@@ -4254,12 +4249,16 @@ checksum = "3d595e54a326bc53c1c197b32d295e14b169e3cfeaa8dc82b529f947fba6bcf5"
 name = "ptsd2"
 version = "0.2.0"
 dependencies = [
+ "base64 0.22.1",
  "chrono",
  "downcast-rs 2.0.2",
  "dyn-clone",
  "hex",
+ "image 0.24.9",
  "include_dir",
+ "media2",
  "prism2",
+ "serde",
  "uuid",
 ]
 
